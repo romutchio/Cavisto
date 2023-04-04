@@ -23,15 +23,9 @@ class VivinoWineClient[F[_]: Async](implicit vivinoHTMLParser: VivinoHtmlParser[
         case (amount, prefix) => Some(s"$amount $prefix")
         case _ => None
     }
-    val rating: Option[Double] = m.vintage.statistics.wine_ratings_average
-
-    val name = m.vintage.name match {
-      case n => n
-      case _ => ""
-    }
     Wine(
-      name = name,
-      rating = rating,
+      name = m.vintage.name,
+      rating = m.vintage.statistics.wine_ratings_average,
       price = price
     )
   }
