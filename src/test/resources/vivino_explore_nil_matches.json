@@ -1,0 +1,22 @@
+{
+  "explore_vintage" : {
+    "market" : {
+      "country" : "ie",
+      "currency" : {
+        "code" : "EUR",
+        "name" : "Euros",
+        "prefix" : "€",
+        "suffix" : null
+      }
+    },
+    "records_matched" : 0,
+    "matches" : [
+    ],
+    "bottle_type_errors" : [
+    ],
+    "records" : [
+    ]
+  },
+  "selected_filters" : [
+  ]
+}
