@@ -14,14 +14,11 @@ class VivinoWineClient[F[_]: Async](implicit vivinoHTMLParser: VivinoHtmlParser[
     httpClient.get(url= "https://www.vivino.com/search/wines", query = Map("q" -> name))
       .flatMap(vivinoHTMLParser.parseSearchHtml)
   }
-
-  private def winesFromMatches(matches: List[Match]): F[List[Wine]] = Async[F].delay {
-    matches.map(wineFromMatches)
-  }
-  private def wineFromMatches(m: Match): Wine = {
-    val price = (m.price.amount, m.price.currency.prefix) match {
-        case (amount, prefix) => Some(s"$amount $prefix")
-        case _ => None
+  private def wineFromMatch(m: Match): Wine = {
+    val price = (m.price.currency.prefix, m.price.currency.suffix, m.price.amount) match {
+      case (Some(prefix), None, value) => Some(s"$prefix $value")
+      case (None, Some(suffix), value) => Some(s"$value $suffix")
+      case _ => None
     }
     Wine(
       name = m.vintage.name,
@@ -43,6 +40,6 @@ class VivinoWineClient[F[_]: Async](implicit vivinoHTMLParser: VivinoHtmlParser[
         "max_rating" -> ratingMax,
         "page" -> 1,
       )
-    ).flatMap(resp => winesFromMatches(resp.explore_vintage.matches))
+    ).flatMap(resp => Async[F].delay(resp.explore_vintage.matches.map(wineFromMatch)))
   }
 }
