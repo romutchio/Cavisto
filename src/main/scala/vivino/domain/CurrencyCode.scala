@@ -1,4 +1,4 @@
-package domain
+package vivino.domain
 
 sealed trait CurrencyCode {
   val code: String

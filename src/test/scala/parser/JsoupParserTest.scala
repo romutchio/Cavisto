@@ -2,9 +2,9 @@ package parser
 
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
-import domain.Wine
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
+import vivino.domain.Wine
 
 import scala.io.Source
 

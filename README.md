@@ -52,7 +52,7 @@ Plan:
 
 Detailed Plan:
 - [x] Init project
-- [ ] Write code for parsing vivino.com
+- [x] Write code for parsing vivino.com
 - [ ] Setup database with docker-compose and connect to it
 - [ ] Write functions for db usage
-- [ ] Integrate with telegram
+- [x] Integrate with telegram

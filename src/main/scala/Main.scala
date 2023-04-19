@@ -1,29 +1,20 @@
+import bot.MessageFormatter
 import cats.effect.{ExitCode, IO, IOApp}
-import client.Http4sHttpClient
-import domain.CountryCode.France
-import domain.CurrencyCode.Euro
+import client.{Http4sHttpClient, WineBot}
 import parser.JsoupVivinoHtmlParser
 import vivino.VivinoWineClient
 
 
 object Main extends IOApp {
-  val run: IO[Unit] = {
+  override def run(args: List[String]): IO[ExitCode] = {
     implicit val jsoupVivinoHTMLParser: JsoupVivinoHtmlParser[IO] = new JsoupVivinoHtmlParser[IO]()
     implicit val httpClient: Http4sHttpClient[IO] = new Http4sHttpClient[IO]()
-    val vivinoClient = new VivinoWineClient[IO]()
+    implicit val vivinoClient: VivinoWineClient[IO] = new VivinoWineClient[IO]()
+    implicit val messageFormatter: MessageFormatter = new MessageFormatter()
 
     for {
-      resp1 <- vivinoClient.adviseWine(France, Euro, 3, 4)
-      resp2 <- vivinoClient.getWinesByName("baron d'")
-      _ = println(resp1)
-      _ = println(resp2)
-    } yield ()
-
-  }
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    for {
-      _ <- run
+      token <- IO.fromOption(sys.env.get("TELEGRAM_TOKEN"))(new Exception("TELEGRAM_TOKEN environment variable not set"))
+      _ <- new WineBot[IO](token).startPolling().map(_ => ExitCode.Success)
     } yield ExitCode.Success
   }
 }
