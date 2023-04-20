@@ -2,7 +2,7 @@ package bot.domain.buttons
 
 import com.bot4s.telegram.models.InlineKeyboardMarkup
 
-object ButtonMarkups {
+object ButtonMarkup {
   val AdviseMarkup: InlineKeyboardMarkup = {
     InlineKeyboardMarkup(
       Seq(
