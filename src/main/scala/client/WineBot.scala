@@ -1,11 +1,7 @@
 package client
 
 import bot.domain.AdviseState
-import bot.domain.buttons.AdviseButtons._
-import bot.domain.buttons.CountryButtons._
-import bot.domain.buttons.PriceButtons._
-import bot.domain.buttons.WineTypeButtons._
-import bot.domain.buttons.{Button, ButtonMarkups}
+import bot.domain.buttons._
 import bot.{MessageFormatter, PerChatState}
 import cats.effect.Async
 import cats.syntax.flatMap._
@@ -69,25 +65,25 @@ class WineBot[F[_] : Async](token: String)(implicit val wineClient: WineClient[F
       }
   }
 
-  onCallbackWithTag(CountrySelectionButton.tag) { implicit cbq =>
+  onCallbackWithTag(CountryButton.Selection.tag) { implicit cbq =>
     withCallbackState {
       s =>
         createCallback(
           cbq,
-          CountrySelectionButton, ButtonMarkups.CountryMarkup,
-          ClearCountrySelectionButton, s.copy(country = None),
+          CountryButton.Selection, ButtonMarkups.CountryMarkup,
+          CountryButton.Clear, s.copy(country = None),
           x => s.copy(country = x),
         )
     }
   }
 
-  onCallbackWithTag(WineTypeSelectionButton.tag) { implicit cbq =>
+  onCallbackWithTag(WineTypeButton.Selection.tag) { implicit cbq =>
     withCallbackState {
       s =>
         createCallback(
           cbq,
-          WineTypeSelectionButton, ButtonMarkups.WineTypeMarkup,
-          ClearWineTypeSelectionButton, s.copy(wineType = None),
+          WineTypeButton.Selection, ButtonMarkups.WineTypeMarkup,
+          WineTypeButton.Clear, s.copy(wineType = None),
           x => s.copy(wineType = x),
         )
     }
@@ -97,8 +93,8 @@ class WineBot[F[_] : Async](token: String)(implicit val wineClient: WineClient[F
   onCallbackWithTag(PriceButtonType.Max.tag) { implicit cbq =>
     withCallbackState { s =>
       createCallback(cbq,
-        PriceSelectionButton(PriceButtonType.Max), ButtonMarkups.PriceMaxMarkup,
-        ClearPriceSelectionButton(PriceButtonType.Max), s.copy(priceMax = None),
+        PriceButton.Selection(PriceButtonType.Max), ButtonMarkups.PriceMaxMarkup,
+        PriceButton.Clear(PriceButtonType.Max), s.copy(priceMax = None),
         x => s.copy(priceMax = x.toIntOption),
       )
     }
@@ -107,28 +103,28 @@ class WineBot[F[_] : Async](token: String)(implicit val wineClient: WineClient[F
   onCallbackWithTag(PriceButtonType.Min.tag) { implicit cbq =>
     withCallbackState { s =>
       createCallback(cbq,
-        PriceSelectionButton(PriceButtonType.Min), ButtonMarkups.PriceMinMarkup,
-        ClearPriceSelectionButton(PriceButtonType.Min), s.copy(priceMin = None),
+        PriceButton.Selection(PriceButtonType.Min), ButtonMarkups.PriceMinMarkup,
+        PriceButton.Clear(PriceButtonType.Min), s.copy(priceMin = None),
         x => s.copy(priceMin = x.toIntOption),
       )
     }
   }
 
-  onCallbackWithTag(AdviseWineButton.tag) { implicit cbq =>
+  onCallbackWithTag(AdviseButton.Advise.tag) { implicit cbq =>
     withCallbackState { s =>
       val maybeEditFuture = for {
         data <- cbq.data
         msg <- cbq.message
         _ <- data match {
-          case x if x == ReturnToSelectionButton.name =>
+          case x if x == AdviseButton.Return.name =>
             createSelectionMarkupRequest(msg, ButtonMarkups.AdviseMarkup)
 
-          case x if x == AdviseWineButton.name =>
+          case x if x == AdviseButton.Advise.name =>
             for {
               wines <- wineClient.adviseWine(
-                s.toCountryCode,
+                s.getCountryCode,
                 Euro,
-                s.toWineType,
+                s.getWineType,
                 3,
                 s.priceMin,
                 s.priceMax

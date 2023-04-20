@@ -1,9 +1,5 @@
 package bot.domain.buttons
 
-import bot.domain.buttons.AdviseButtons._
-import bot.domain.buttons.CountryButtons._
-import bot.domain.buttons.PriceButtons._
-import bot.domain.buttons.WineTypeButtons._
 import com.bot4s.telegram.models.InlineKeyboardMarkup
 
 object ButtonMarkups {
@@ -11,15 +7,15 @@ object ButtonMarkups {
     InlineKeyboardMarkup(
       Seq(
         Seq(
-          CountrySelectionButton.toInlineKeyboardButton,
-          WineTypeSelectionButton.toInlineKeyboardButton,
+          CountryButton.Selection.toInlineKeyboardButton,
+          WineTypeButton.Selection.toInlineKeyboardButton,
         ),
         Seq(
-          PriceSelectionButton(PriceButtonType.Min).toInlineKeyboardButton,
-          PriceSelectionButton(PriceButtonType.Max).toInlineKeyboardButton,
+          PriceButton.Selection(PriceButtonType.Min).toInlineKeyboardButton,
+          PriceButton.Selection(PriceButtonType.Max).toInlineKeyboardButton,
         ),
         Seq(
-          AdviseWineButton.toInlineKeyboardButton,
+          AdviseButton.Advise.toInlineKeyboardButton,
         )
       )
     )
@@ -29,25 +25,25 @@ object ButtonMarkups {
     InlineKeyboardMarkup(
       Seq(
         Seq(
-          ArgentinaCountryButton.toInlineKeyboardButton,
-          AustraliaCountryButton.toInlineKeyboardButton,
-          AustriaCountryButton.toInlineKeyboardButton
+          CountryButton.Argentina.toInlineKeyboardButton,
+          CountryButton.Australia.toInlineKeyboardButton,
+          CountryButton.Austria.toInlineKeyboardButton
         ),
         Seq(
-          ChileCountryButton.toInlineKeyboardButton,
-          FranceCountryButton.toInlineKeyboardButton,
-          GermanyCountryButton.toInlineKeyboardButton,
-          ItalyCountryButton.toInlineKeyboardButton,
+          CountryButton.Chile.toInlineKeyboardButton,
+          CountryButton.France.toInlineKeyboardButton,
+          CountryButton.Germany.toInlineKeyboardButton,
+          CountryButton.Italy.toInlineKeyboardButton,
         ),
         Seq(
-          PortugalCountryButton.toInlineKeyboardButton,
-          RussiaCountryButton.toInlineKeyboardButton,
-          SpainCountryButton.toInlineKeyboardButton,
-          UnitedStatesCountryButton.toInlineKeyboardButton
+          CountryButton.Portugal.toInlineKeyboardButton,
+          CountryButton.Russia.toInlineKeyboardButton,
+          CountryButton.Spain.toInlineKeyboardButton,
+          CountryButton.UnitedStates.toInlineKeyboardButton
         ),
         Seq(
-          ReturnToSelectionButton.toInlineKeyboardButton,
-          ClearCountrySelectionButton.toInlineKeyboardButton
+          AdviseButton.Return.toInlineKeyboardButton,
+          CountryButton.Clear.toInlineKeyboardButton
         )
       )
     )
@@ -57,18 +53,18 @@ object ButtonMarkups {
     InlineKeyboardMarkup(
       Seq(
         Seq(
-          RedWineButton.toInlineKeyboardButton,
-          WhiteWineButton.toInlineKeyboardButton,
-          SparklingWineButton.toInlineKeyboardButton,
+          WineTypeButton.Red.toInlineKeyboardButton,
+          WineTypeButton.White.toInlineKeyboardButton,
+          WineTypeButton.Sparkling.toInlineKeyboardButton,
         ),
         Seq(
-          RoseWineButton.toInlineKeyboardButton,
-          DessertWineButton.toInlineKeyboardButton,
-          FortifiedWineButton.toInlineKeyboardButton,
+          WineTypeButton.Rose.toInlineKeyboardButton,
+          WineTypeButton.Dessert.toInlineKeyboardButton,
+          WineTypeButton.Fortified.toInlineKeyboardButton,
         ),
         Seq(
-          ReturnToSelectionButton.toInlineKeyboardButton,
-          ClearWineTypeSelectionButton.toInlineKeyboardButton
+          AdviseButton.Return.toInlineKeyboardButton,
+          WineTypeButton.Clear.toInlineKeyboardButton
         )
       )
     )
@@ -81,29 +77,29 @@ object ButtonMarkups {
     InlineKeyboardMarkup(
       Seq(
         Seq(
-          EuroPriceButton("2", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("3", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("5", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("10", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("25", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("2", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("3", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("5", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("10", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("25", priceButtonType).toInlineKeyboardButton,
         ),
         Seq(
-          EuroPriceButton("50", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("100", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("150", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("200", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("250", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("50", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("100", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("150", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("200", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("250", priceButtonType).toInlineKeyboardButton,
         ),
         Seq(
-          EuroPriceButton("300", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("350", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("400", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("450", priceButtonType).toInlineKeyboardButton,
-          EuroPriceButton("500", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("300", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("350", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("400", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("450", priceButtonType).toInlineKeyboardButton,
+          PriceButton.Euro("500", priceButtonType).toInlineKeyboardButton,
         ),
         Seq(
-          ReturnToSelectionButton.toInlineKeyboardButton,
-          ClearPriceSelectionButton(priceButtonType).toInlineKeyboardButton
+          AdviseButton.Return.toInlineKeyboardButton,
+          PriceButton.Clear(priceButtonType).toInlineKeyboardButton
         )
       )
     )

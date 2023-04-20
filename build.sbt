@@ -46,6 +46,12 @@ libraryDependencies ++= Seq(
   "com.bot4s" %% "telegram-akka"
 ).map(_ % bot4sVersion)
 
+val enumeratumVersion = "1.7.2"
+
+libraryDependencies ++= Seq(
+  "com.beachape" %% "enumeratum" % enumeratumVersion
+)
+
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
 //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 

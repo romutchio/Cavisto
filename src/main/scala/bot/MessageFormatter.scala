@@ -40,6 +40,6 @@ class MessageFormatter {
       adviseState.wineType.map(x => s"*Type:* $x"),
       adviseState.priceMin.map(x => s"*Price from:* € $x"),
       adviseState.priceMax.map(x => s"*Price to:* € $x")
-    ).mkString("\n")
+    ).flatten.mkString("\n")
   }
 }
