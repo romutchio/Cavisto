@@ -43,13 +43,22 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
   "com.bot4s" %% "telegram-core",
-  "com.bot4s" %% "telegram-akka"
 ).map(_ % bot4sVersion)
 
 val enumeratumVersion = "1.7.2"
 
 libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % enumeratumVersion
+)
+
+lazy val doobieVersion = "1.0.0-RC1"
+
+libraryDependencies ++= Seq(
+  "org.tpolecat" %% "doobie-core"           % doobieVersion,
+  "org.tpolecat" %% "doobie-postgres"       % doobieVersion,
+  "org.tpolecat" %% "doobie-specs2"         % doobieVersion,
+  "org.tpolecat" %% "doobie-hikari"         % doobieVersion,
+  "org.tpolecat" %% "doobie-postgres-circe" % doobieVersion,
 )
 
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
