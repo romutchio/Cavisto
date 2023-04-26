@@ -1,12 +1,12 @@
 package parser
 
 import cats.effect.Sync
-import domain.Wine
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
-import net.ruippeixotog.scalascraper.scraper.ContentExtractors.{elementList, text}
 import net.ruippeixotog.scalascraper.dsl.DSL._
+import net.ruippeixotog.scalascraper.scraper.ContentExtractors.{elementList, text}
+import vivino.domain.Wine
 
-class JsoupVivinoHtmlParser[F[_]: Sync] extends VivinoHtmlParser[F] {
+class JsoupVivinoHtmlParser[F[_] : Sync] extends VivinoHtmlParser[F] {
   private val jsoupBrowser = JsoupBrowser()
 
   def parseSearchHtml(html: String): F[List[Wine]] = Sync[F].delay {
@@ -28,4 +28,8 @@ class JsoupVivinoHtmlParser[F[_]: Sync] extends VivinoHtmlParser[F] {
       Wine(name, rating, price)
     }
   }
+}
+
+object JsoupVivinoHtmlParser {
+  def make[F[_] : Sync]: F[JsoupVivinoHtmlParser[F]] = Sync[F].delay(new JsoupVivinoHtmlParser[F])
 }
