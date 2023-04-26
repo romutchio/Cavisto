@@ -11,12 +11,11 @@ class MessageFormatter {
 
   def getWinesFoundMessage(wines: List[Wine]): String = wines.map(getWineMessage).mkString("\n")
 
-  private def getWineMessage(wine: Wine): String =
-    List(
-      Some(s"*${wine.name}*"),
-      wine.price.map(x => s"_Price: ${x}_"),
-      wine.rating.map(x => s"_Rating: ${x}_")
-    ).flatten.mkString(" ")
+  private def getWineMessage(wine: Wine): String = {
+    val price = wine.price.getOrElse("...")
+    val rating = wine.rating.map(_.toString).getOrElse("...")
+    s"*${wine.name}* _Price: ${price}_ _Rating: ${rating}_"
+  }
 
   def getWinesNotFoundMessage(input: String): String = {
     s"Nothing found for: _${input}_"
