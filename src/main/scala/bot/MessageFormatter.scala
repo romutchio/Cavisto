@@ -56,7 +56,7 @@ class MessageFormatter {
        |*Price to*: ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}
        |""".stripMargin
 
-  def getNoteStateMessage(noteState: NoteState) =
+  def getNoteStateMessage(noteState: NoteState): String =
     s"""
        |Save your personal note about wine:
        |
