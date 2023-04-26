@@ -1,6 +1,7 @@
 import bot.{AdviseStateStore, MessageFormatter}
 import cats.effect.{ExitCode, IO, IOApp}
 import client.{Http4sHttpClient, WineBot}
+import database.DoobieDatabaseClient
 import parser.JsoupVivinoHtmlParser
 import vivino.VivinoWineClient
 
@@ -16,7 +17,8 @@ object Main extends IOApp {
       token <- IO.fromOption(sys.env.get("TELEGRAM_TOKEN"))(
         new Exception("TELEGRAM_TOKEN environment variable not set")
       )
-      wineBot <- WineBot.make[IO](token, vivinoClient, messageFormatter, store)
+      databaseClient <- DoobieDatabaseClient.make[IO]
+      wineBot <- WineBot.make[IO](token, vivinoClient, messageFormatter, store, databaseClient)
       _ <- wineBot.startPolling().map(_ => ExitCode.Success)
     } yield ExitCode.Success
   }

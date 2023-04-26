@@ -11,6 +11,7 @@ import com.bot4s.telegram.api.declarative.{Callbacks, Commands, RegexCommands}
 import com.bot4s.telegram.cats.{Polling, TelegramBot}
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, EditMessageText, ParseMode}
 import com.bot4s.telegram.models.{CallbackQuery, ChatId, InlineKeyboardMarkup, Message}
+import database.DatabaseClient
 import org.asynchttpclient.Dsl.asyncHttpClient
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import vivino.WineClient
@@ -20,6 +21,7 @@ class WineBot[F[_] : Async](token: String)(
   wineClient: WineClient[F],
   messageFormatter: MessageFormatter,
   store: AdviseStateStore[F],
+  databaseClient: DatabaseClient[F],
 )
   extends TelegramBot[F](token, AsyncHttpClientCatsBackend.usingClient[F](asyncHttpClient()))
     with Polling[F]
@@ -30,6 +32,27 @@ class WineBot[F[_] : Async](token: String)(
 
   implicit val perChatStateStore: AdviseStateStore[F] = store
 
+  onCommand("/start") {
+    implicit msg =>
+      for {
+        msgFrom <- Async[F].delay(msg.from)
+        telegramUser = msgFrom.get
+        _ <- databaseClient.insertUser(
+          telegram_id = telegramUser.id,
+          username = telegramUser.username,
+          firstName = telegramUser.firstName,
+          lastName = telegramUser.lastName,
+        )
+        _ <- reply(
+          text = messageFormatter.getWelcomeMessage(
+            telegramUser.username,
+            telegramUser.firstName,
+            telegramUser.lastName,
+          ),
+          parseMode = ParseMode.Markdown,
+        ).void
+      } yield ()
+  }
 
   onRegex("""/search+\s(.+)""".r) {
     implicit msg => {
@@ -68,6 +91,7 @@ class WineBot[F[_] : Async](token: String)(
             _ <- reply(
               messageFormatter.getAdviseStateMessage(state),
               replyMarkup = ButtonMarkup.AdviseMarkup,
+              parseMode = ParseMode.Markdown,
             ).void
           } yield ()
       }
@@ -161,6 +185,11 @@ class WineBot[F[_] : Async](token: String)(
                   messageFormatter.getAdviseStateMessageWinesNotFound(state),
                 )
               }
+              userDb <- databaseClient.getUser(cbq.from.id)
+              _ <- userDb match {
+                case Some(user) => databaseClient.insertAdviseHistory(user.user_id, state)
+                case None => Async[F].pure()
+              }
             } yield ()
         }
       } yield ()
@@ -225,6 +254,12 @@ class WineBot[F[_] : Async](token: String)(
 
 
 object WineBot {
-  def make[F[_] : Async](token: String, wineClient: WineClient[F], messageFormatter: MessageFormatter, store: AdviseStateStore[F]): F[WineBot[F]] =
-    Async[F].delay(new WineBot[F](token)(wineClient, messageFormatter, store))
+  def make[F[_] : Async](
+    token: String,
+    wineClient: WineClient[F],
+    messageFormatter: MessageFormatter,
+    store: AdviseStateStore[F],
+    databaseClient: DatabaseClient[F],
+  ): F[WineBot[F]] =
+    Async[F].delay(new WineBot[F](token)(wineClient, messageFormatter, store, databaseClient))
 }

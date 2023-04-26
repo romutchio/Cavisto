@@ -10,7 +10,10 @@ import doobie.util.transactor.Transactor.Aux
 import io.circe.generic.auto._
 
 trait DatabaseClient[F[_]] {
-
+  def insertUser(telegram_id: Long, username: Option[String], firstName: Option[String], lastName: Option[String]): F[Int]
+  def getUser(telegram_id: Long): F[Option[User]]
+  def insertAdviseHistory(user_id: Long, adviseState: AdviseState): F[Int]
+  def getAdviseHistory(user_id: Long): F[List[AdviseHistory]]
 }
 
 class DoobieDatabaseClient[F[_] : Async] extends DatabaseClient[F] {
@@ -23,43 +26,21 @@ class DoobieDatabaseClient[F[_] : Async] extends DatabaseClient[F] {
 
   implicit val metaAdviseState: Meta[AdviseState] = new Meta(pgDecoderGet, pgEncoderPut)
 
-  def dropUsersTable(): F[Int] = sql"""DROP TABLE IF EXISTS users""".update.run.transact(transactor)
+  def insertUser(telegram_id: Long, username: Option[String], firstName: Option[String], lastName: Option[String]): F[Int] =
+    sql"insert into users (telegram_id, username, first_name, last_name) values ($telegram_id, $username, $firstName, $lastName) on conflict (telegram_id) do update set first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name".update.run.transact(transactor)
 
-  def createUsersTable(): F[Int] =
-    sql"""
-    CREATE TABLE users (
-      id   SERIAL PRIMARY KEY,
-      telegram_id INTEGER NOT NULL UNIQUE,
-      first_name VARCHAR NULL,
-      last_name VARCHAR NULL,
-      username VARCHAR NULL UNIQUE,
-      created_at timestamp default now()
-    )
-  """.update.run.transact(transactor)
+  def getUser(telegram_id: Long): F[Option[User]] =
+    sql"select id, telegram_id, first_name, last_name, username, created_at from users where telegram_id = $telegram_id".query[User].option.transact(transactor)
 
-  def dropAdviseHistoryTable(): F[Int] = sql"""DROP TABLE IF EXISTS advise_history""".update.run.transact(transactor)
-
-  def createAdviseHistoryTable(): F[Int] =
-    sql"""
-    CREATE TABLE advise_history (
-      id   SERIAL PRIMARY KEY,
-      user_id   INTEGER NOT NULL,
-      advise_state jsonb not null default '{}'::jsonb,
-      created_at timestamp default now(),
-      FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-    )
-  """.update.run.transact(transactor)
-
-  def insertUser(telegram_id: Long, username: Option[String]): F[Int] =
-    sql"insert into users (telegram_id, username) values ($telegram_id, $username)".update.run.transact(transactor)
-
-  def selectUser(telegram_id: Long): F[Option[User]] =
-    sql"select telegram_id, first_name, last_name, username, created_at from users where telegram_id = $telegram_id".query[User].option.transact(transactor)
-
-  def insertAdviseHistory(user_id: Int, adviseState: AdviseState): F[Int] =
+  def insertAdviseHistory(user_id: Long, adviseState: AdviseState): F[Int] =
     sql"insert into advise_history (user_id, advise_state) values ($user_id, $adviseState)".update.run.transact(transactor)
 
   def getAdviseHistory(user_id: Long): F[List[AdviseHistory]] =
     sql"select user_id, advise_state, created_at from advise_history where user_id = $user_id".query[AdviseHistory].to[List].transact(transactor)
 
+}
+
+
+object DoobieDatabaseClient {
+  def make[F[_] : Async]: F[DoobieDatabaseClient[F]] = Async[F].delay(new DoobieDatabaseClient[F])
 }
