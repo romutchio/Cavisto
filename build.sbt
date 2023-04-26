@@ -12,6 +12,8 @@ val http4sVersion = "1.0.0-M39"
 val circeVersion = "0.14.1"
 val scalaTestVersion = "3.2.12"
 val bot4sVersion = "5.6.3"
+val enumeratumVersion = "1.7.2"
+val doobieVersion = "1.0.0-RC1"
 
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-effect" % "3.4.8",
@@ -45,13 +47,9 @@ libraryDependencies ++= Seq(
   "com.bot4s" %% "telegram-core",
 ).map(_ % bot4sVersion)
 
-val enumeratumVersion = "1.7.2"
-
 libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % enumeratumVersion
 )
-
-lazy val doobieVersion = "1.0.0-RC1"
 
 libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-core"           % doobieVersion,
@@ -62,7 +60,6 @@ libraryDependencies ++= Seq(
 )
 
 addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
-//addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 lazy val root = (project in file("."))
   .settings(
