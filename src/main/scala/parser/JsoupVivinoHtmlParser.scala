@@ -29,3 +29,7 @@ class JsoupVivinoHtmlParser[F[_] : Sync] extends VivinoHtmlParser[F] {
     }
   }
 }
+
+object JsoupVivinoHtmlParser {
+  def make[F[_] : Sync]: F[JsoupVivinoHtmlParser[F]] = Sync[F].delay(new JsoupVivinoHtmlParser[F])
+}

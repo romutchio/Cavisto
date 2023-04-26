@@ -14,6 +14,6 @@ trait Button {
 
   private def prefixTag(tag: String)(s: String): String = tag + s
 
-  def toInlineKeyboardButton: InlineKeyboardButton =
+  def toKeyboardButton: InlineKeyboardButton =
     InlineKeyboardButton.callbackData(this.button, prefixTag(tag)(this.name))
 }

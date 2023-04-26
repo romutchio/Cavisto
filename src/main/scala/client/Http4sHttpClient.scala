@@ -3,12 +3,13 @@ package client
 import cats.effect.Async
 import io.circe.Decoder
 import org.http4s.circe.jsonOf
-import org.http4s.{Headers, MediaType, Method, Request, Uri}
 import org.http4s.client.{Client, JavaNetClientBuilder}
 import org.http4s.headers.Accept
+import org.http4s._
 
-class Http4sHttpClient[F[_]: Async] extends HttpClient[F] {
+class Http4sHttpClient[F[_] : Async] extends HttpClient[F] {
   private val client: Client[F] = JavaNetClientBuilder[F].create
+
   def get(url: String, query: Map[String, String]): F[String] = {
     val r = Request[F](
       method = Method.GET,
@@ -16,6 +17,7 @@ class Http4sHttpClient[F[_]: Async] extends HttpClient[F] {
     )
     client.fetchAs[String](r)
   }
+
   def getJson[T: Decoder](url: String, queryStr: Map[String, String], queryInt: Map[String, Int]): F[T] = {
     val r = Request[F](
       method = Method.GET,
@@ -28,4 +30,8 @@ class Http4sHttpClient[F[_]: Async] extends HttpClient[F] {
     )
     client.fetchAs[T](r)(jsonOf[F, T])
   }
+}
+
+object Http4sHttpClient {
+  def make[F[_] : Async]: F[Http4sHttpClient[F]] = Async[F].delay(new Http4sHttpClient[F])
 }

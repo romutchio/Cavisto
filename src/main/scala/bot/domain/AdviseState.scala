@@ -13,3 +13,7 @@ case class AdviseState(
 
   def getWineType: Option[WineType] = this.wineType.flatMap(WineTypeButton.withNameOption(_).map(_.wineType))
 }
+
+object AdviseState {
+  def empty: AdviseState = AdviseState(None, None, None, None)
+}

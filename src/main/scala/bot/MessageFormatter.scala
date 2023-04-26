@@ -5,41 +5,44 @@ import vivino.domain.Wine
 
 
 class MessageFormatter {
-  def winesSearch(input: String): String = {
+  def getSearchWinesMessage(input: String): String = {
     s"Searching for: _${input}_"
   }
 
-  def winesToMessage(wines: List[Wine]): String = wines.map(wineToMessage).mkString("\n")
+  def getWinesFoundMessage(wines: List[Wine]): String = wines.map(getWineMessage).mkString("\n")
 
-  private def wineToMessage(wine: Wine): String = List(
-    Some(s"*${wine.name}*"),
-    wine.price.map(x => s"_Price: ${x}_"),
-    wine.rating.map(x => s"_Rating: ${x}_")
-  ).flatten.mkString(" ")
+  private def getWineMessage(wine: Wine): String =
+    List(
+      Some(s"*${wine.name}*"),
+      wine.price.map(x => s"_Price: ${x}_"),
+      wine.rating.map(x => s"_Rating: ${x}_")
+    ).flatten.mkString(" ")
 
-  def winesToMessageNotFound(input: String): String = {
+  def getWinesNotFoundMessage(input: String): String = {
     s"Nothing found for: _${input}_"
   }
 
-  def adviseStateToMessage(adviseState: AdviseState): String = {
-    List(
-      Some("Advice options:"),
-      Some(""),
-      adviseState.country.map(x => s"*Country:* $x"),
-      adviseState.wineType.map(x => s"*Type:* $x"),
-      adviseState.priceMin.map(x => s"*Price from:* € $x"),
-      adviseState.priceMax.map(x => s"*Price to:* € $x")
-    ).flatten.mkString("\n")
-  }
+  def getAdviseStateMessage(adviseState: AdviseState): String =
+    s"""
+       |Advise options:
+       |
+       |*Country:* ${adviseState.country.getOrElse("-")}
+       |*Type:* ${adviseState.wineType.getOrElse("-")}
+       |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("-")}
+       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("-")}
+       |""".stripMargin
 
-  def adviseStateToMessageNotFound(adviseState: AdviseState): String = {
-    List(
-      Some("*Nothing was found* for selected options:"),
-      Some(""),
-      adviseState.country.map(x => s"*Country:* $x"),
-      adviseState.wineType.map(x => s"*Type:* $x"),
-      adviseState.priceMin.map(x => s"*Price from:* € $x"),
-      adviseState.priceMax.map(x => s"*Price to:* € $x")
-    ).flatten.mkString("\n")
-  }
+  def getAdviseStateMessageWinesNotFound(adviseState: AdviseState): String =
+    s"""
+       |*Nothing was found* for selected options:
+       |
+       |*Country:* ${adviseState.country.getOrElse("-")}
+       |*Type:* ${adviseState.wineType.getOrElse("-")}
+       |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("-")}
+       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("-")}
+       |""".stripMargin
+}
+
+object MessageFormatter {
+  def make: MessageFormatter = new MessageFormatter
 }

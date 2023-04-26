@@ -9,7 +9,7 @@ import parser.VivinoHtmlParser
 import vivino.domain.{CountryCode, CurrencyCode, Wine, WineType}
 
 
-class VivinoWineClient[F[_] : Async](implicit vivinoHTMLParser: VivinoHtmlParser[F], httpClient: HttpClient[F]) extends WineClient[F] {
+class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], httpClient: HttpClient[F]) extends WineClient[F] {
   def getWinesByName(name: String): F[List[Wine]] = {
     httpClient.get(url = "https://www.vivino.com/search/wines", query = Map("q" -> name))
       .flatMap(vivinoHTMLParser.parseSearchHtml)
@@ -59,4 +59,10 @@ class VivinoWineClient[F[_] : Async](implicit vivinoHTMLParser: VivinoHtmlParser
       queryInt = queryInt,
     ).flatMap(resp => Async[F].delay(resp.explore_vintage.matches.map(wineFromMatch)))
   }
+}
+
+object VivinoWineClient {
+  def make[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], httpClient: HttpClient[F]): F[VivinoWineClient[F]]
+    = Async[F].delay( new VivinoWineClient[F](vivinoHTMLParser, httpClient))
+
 }
