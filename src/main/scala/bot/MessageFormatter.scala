@@ -5,6 +5,21 @@ import vivino.domain.Wine
 
 
 class MessageFormatter {
+  def getWelcomeMessage(username: Option[String], firstName: String, lastName: Option[String]): String = {
+    val name = (username, firstName, lastName) match {
+      case (Some(user), _, _) => user
+      case (_, firstName, Some(last)) => s"$firstName $last"
+      case (_, firstName, _) => firstName
+    }
+    s"""
+      |*$name*, welcome to Cavisto bot.
+      |
+      |_Available commands:_
+      |/advise -- Ask for wine advice, using filters
+      |/search -- Search wines by name. Example: /search cabernet
+      |""".stripMargin
+  }
+
   def getSearchWinesMessage(input: String): String = {
     s"Searching for: _${input}_"
   }
