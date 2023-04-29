@@ -15,8 +15,9 @@ class MessageFormatter {
        |*$name*, welcome to Cavisto bot.
        |
        |_Available commands:_
-       |/advise -- Ask for wine advice, using filters
-       |/search -- Search wines by name. Example: /search cabernet
+       |/advise — Ask for wine advice, using filters.
+       |/search ... — Search wines by name. Example: /search cabernet
+       |/note — Create a note about wine.
        |""".stripMargin
   }
 
@@ -75,6 +76,14 @@ class MessageFormatter {
   val getEditRatingMessage = "OK. Send me the new 'Rating' for 1 to 5. For example: 3"
 
   def getEditAppliedMessage(fieldName: String, text: String) = s"Ok. $fieldName was changed to: $text"
+
+  def getNoteSavedMessage(wineName: String) = s"Note about wine '$wineName' was successfully saved."
+
+  val getNoteSavedErrorMessage = "Note was not saved. Try again later."
+
+  val getAdviseHistorySavedErrorMessage = "Advise history was not saved."
+
+  val getUserSavedErrorMessage = "Error, saving user info. Try again later."
 
 }
 

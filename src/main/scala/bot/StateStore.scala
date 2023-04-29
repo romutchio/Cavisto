@@ -7,16 +7,16 @@ import com.bot4s.telegram.models.{CallbackQuery, Message}
 
 
 class StateStore[F[_] : Sync, S <: State](store: Ref[F, Map[Long, S]], default: => S) {
-  def setCallbackState(value: S)(implicit cbq: CallbackQuery): F[Unit] = {
+  def setCallbackState(value: S)(implicit cbq: CallbackQuery): F[S] = {
     for {
       _ <- store.update(_ + (cbq.message.get.chat.id -> value))
-    } yield ()
+    } yield value
   }
 
-  def setMessageState(value: S)(implicit msg: Message): F[Unit] = {
+  def setMessageState(value: S)(implicit msg: Message): F[S] = {
     for {
       _ <- store.update(_ + (msg.chat.id -> value))
-    } yield ()
+    } yield value
   }
 
   def withMessageState(f: F[S] => F[Unit])(implicit msg: Message): F[Unit] = f(getMessageState)

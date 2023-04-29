@@ -1,7 +1,7 @@
 package bot.domain.buttons
 
 sealed abstract class NoteButton extends Button {
-  val tag: String = "NOTE_TAG"
+  val tag: String = "Note_TAG"
 }
 
 object EditNoteButton {
@@ -31,15 +31,16 @@ object EditNoteButton {
 }
 
 object NoteButton {
-
-  final case object Return extends NoteButton {
-    val emoji: Option[String] = Some("«")
-    val name: String = "Back to notes"
-  }
-
-  final case object Save extends NoteButton {
+  final case object Save extends Button {
+    val tag: String = "NoteSave_TAG"
     val emoji: Option[String] = Some("✅")
     val name: String = "Save note"
+  }
+
+  final case object Clear extends Button {
+    val tag: String = "NoteClear_TAG"
+    val emoji: Option[String] = None
+    val name: String = "Clear"
   }
 
 }
