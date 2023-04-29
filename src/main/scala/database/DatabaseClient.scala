@@ -1,6 +1,6 @@
 package database
 
-import bot.domain.AdviseState
+import bot.domain.states.AdviseState
 import cats.effect._
 import database.models.{AdviseHistory, User}
 import doobie._
@@ -11,8 +11,11 @@ import io.circe.generic.auto._
 
 trait DatabaseClient[F[_]] {
   def insertUser(telegram_id: Long, username: Option[String], firstName: Option[String], lastName: Option[String]): F[Int]
+
   def getUser(telegram_id: Long): F[Option[User]]
+
   def insertAdviseHistory(user_id: Long, adviseState: AdviseState): F[Int]
+
   def getAdviseHistory(user_id: Long): F[List[AdviseHistory]]
 }
 

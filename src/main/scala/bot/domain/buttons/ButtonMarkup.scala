@@ -87,4 +87,14 @@ object ButtonMarkup {
       ).map(_.map(_.toKeyboardButton))
     )
   }
+
+  val NoteMarkup: InlineKeyboardMarkup = {
+    InlineKeyboardMarkup(
+      Seq(
+        Seq(EditNoteButton.Name, EditNoteButton.Rating),
+        Seq(EditNoteButton.Price, EditNoteButton.Review),
+        Seq(NoteButton.Return, NoteButton.Save),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
 }

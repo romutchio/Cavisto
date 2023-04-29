@@ -1,6 +1,6 @@
 package database.models
 
-import bot.domain.AdviseState
+import bot.domain.states.AdviseState
 
 import java.util.Date
 

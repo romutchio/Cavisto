@@ -1,6 +1,6 @@
 package bot
 
-import bot.domain.AdviseState
+import bot.domain.states.{AdviseState, NoteState}
 import vivino.domain.Wine
 
 
@@ -12,12 +12,12 @@ class MessageFormatter {
       case (_, firstName, _) => firstName
     }
     s"""
-      |*$name*, welcome to Cavisto bot.
-      |
-      |_Available commands:_
-      |/advise -- Ask for wine advice, using filters
-      |/search -- Search wines by name. Example: /search cabernet
-      |""".stripMargin
+       |*$name*, welcome to Cavisto bot.
+       |
+       |_Available commands:_
+       |/advise -- Ask for wine advice, using filters
+       |/search -- Search wines by name. Example: /search cabernet
+       |""".stripMargin
   }
 
   def getSearchWinesMessage(input: String): String = {
@@ -40,21 +40,42 @@ class MessageFormatter {
     s"""
        |Advise options:
        |
-       |*Country:* ${adviseState.country.getOrElse("-")}
-       |*Type:* ${adviseState.wineType.getOrElse("-")}
-       |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("-")}
-       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("-")}
+       |*Country:* ${adviseState.country.getOrElse("...")}
+       |*Type:* ${adviseState.wineType.getOrElse("...")}
+       |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("...")}
+       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}
        |""".stripMargin
 
   def getAdviseStateMessageWinesNotFound(adviseState: AdviseState): String =
     s"""
        |*Nothing was found* for selected options:
        |
-       |*Country:* ${adviseState.country.getOrElse("-")}
-       |*Type:* ${adviseState.wineType.getOrElse("-")}
-       |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("-")}
-       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("-")}
+       |*Country*: ${adviseState.country.getOrElse("...")}
+       |*Type*: ${adviseState.wineType.getOrElse("...")}
+       |*Price from*: ${adviseState.priceMin.map(price => s"€ $price").getOrElse("...")}
+       |*Price to*: ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}
        |""".stripMargin
+
+  def getNoteStateMessage(noteState: NoteState) =
+    s"""
+       |Save your personal note about wine:
+       |
+       |*Wine name*: ${noteState.wineName.getOrElse("...")}
+       |*Rating*: ${noteState.rating.getOrElse("...")}
+       |*Price*: ${noteState.price.getOrElse("...")}
+       |*Review*: ${noteState.review.getOrElse("...")}
+       |""".stripMargin
+
+  val getEditWineNameMessage = "OK. Send me the name of Wine."
+
+  val getEditReviewMessage = "OK. Send me the new 'Review' text."
+
+  val getEditPriceMessage = "OK. Send me the new 'Price' in Euro. For example: 40"
+
+  val getEditRatingMessage = "OK. Send me the new 'Rating' for 1 to 5. For example: 3"
+
+  def getEditAppliedMessage(fieldName: String, text: String) = s"Ok. $fieldName was changed to: $text"
+
 }
 
 object MessageFormatter {

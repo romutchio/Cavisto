@@ -43,10 +43,10 @@ Plan:
 3. Add telegram bot interaction
    1. Save user info to Postgres db
    2. Save user wines (formalize name using vivino api), support photo uploading
-   3. Add '/advice' command with parameters, suggest user preferences based on saved vines
+   3. Add '/advise' command with parameters, suggest user preferences based on saved vines
    4. Add '/top' command to get most popular wines among users
-   5. Add '/review' command for writing user's personal review
-   6. ...
+   5. Add '/note' command for writing user's personal note about wine
+   6. Add '/search' command to search wines by name
 
 
 
@@ -56,3 +56,6 @@ Detailed Plan:
 - [ ] Setup database with docker-compose and connect to it
 - [ ] Write functions for db usage
 - [x] Integrate with telegram
+  - [x] Implement '/advise' command
+  - [x] Implement '/note' command
+  - [x] Implement '/search' command
