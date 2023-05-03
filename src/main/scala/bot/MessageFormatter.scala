@@ -15,6 +15,7 @@ class MessageFormatter {
        |*$name*, welcome to Cavisto bot.
        |
        |_Available commands:_
+       |/start — Get a help message.
        |/advise — Ask for wine advice, using filters.
        |/search ... — Search wines by name. Example: /search cabernet
        |/note — Create a note about wine.
