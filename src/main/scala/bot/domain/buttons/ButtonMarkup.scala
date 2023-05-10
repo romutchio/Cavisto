@@ -6,15 +6,9 @@ object ButtonMarkup {
   val AdviseMarkup: InlineKeyboardMarkup = {
     InlineKeyboardMarkup(
       Seq(
-        Seq(
-          CountryButton.Selection, WineTypeButton.Selection
-        ),
-        Seq(
-          PriceButton.Selection(PriceButtonType.Min), PriceButton.Selection(PriceButtonType.Max)
-        ),
-        Seq(
-          AdviseButton.Advise
-        ),
+        Seq(CountryButton.Selection, WineTypeButton.Selection),
+        Seq(PriceButton.Selection(PriceButtonType.Min), PriceButton.Selection(PriceButtonType.Max)),
+        Seq(AdviseButton.Clear, AdviseButton.Advise),
       ).map(_.map(_.toKeyboardButton))
     )
   }
@@ -22,18 +16,10 @@ object ButtonMarkup {
   val CountryMarkup: InlineKeyboardMarkup = {
     InlineKeyboardMarkup(
       Seq(
-        Seq(
-          CountryButton.Argentina, CountryButton.Australia, CountryButton.Austria
-        ),
-        Seq(
-          CountryButton.Chile,     CountryButton.France,    CountryButton.Germany, CountryButton.Italy,
-        ),
-        Seq(
-          CountryButton.Portugal,  CountryButton.Russia,    CountryButton.Spain,   CountryButton.UnitedStates
-        ),
-        Seq(
-          AdviseButton.Return,     CountryButton.Clear
-        ),
+        Seq(CountryButton.Argentina, CountryButton.Australia, CountryButton.Austria),
+        Seq(CountryButton.Chile, CountryButton.France, CountryButton.Germany, CountryButton.Italy),
+        Seq(CountryButton.Portugal, CountryButton.Russia, CountryButton.Spain, CountryButton.UnitedStates),
+        Seq(AdviseButton.Return, CountryButton.Clear),
       ).map(_.map(_.toKeyboardButton))
     )
   }
@@ -41,15 +27,9 @@ object ButtonMarkup {
   val WineTypeMarkup: InlineKeyboardMarkup = {
     InlineKeyboardMarkup(
       Seq(
-        Seq(
-          WineTypeButton.Red,  WineTypeButton.White,   WineTypeButton.Sparkling,
-        ),
-        Seq(
-          WineTypeButton.Rose, WineTypeButton.Dessert, WineTypeButton.Fortified,
-        ),
-        Seq(
-          AdviseButton.Return, WineTypeButton.Clear
-        ),
+        Seq(WineTypeButton.Red, WineTypeButton.White, WineTypeButton.Sparkling),
+        Seq(WineTypeButton.Rose, WineTypeButton.Dessert, WineTypeButton.Fortified),
+        Seq(AdviseButton.Return, WineTypeButton.Clear),
       ).map(_.map(_.toKeyboardButton))
     )
   }
@@ -60,30 +40,20 @@ object ButtonMarkup {
   private def priceMarkup(priceButtonType: PriceButtonType): InlineKeyboardMarkup = {
     InlineKeyboardMarkup(
       Seq(
-        Seq(
-          PriceButton.Euro("2", priceButtonType),
-          PriceButton.Euro("3", priceButtonType),
-          PriceButton.Euro("5", priceButtonType),
-          PriceButton.Euro("10", priceButtonType),
-          PriceButton.Euro("25", priceButtonType),
-        ),
-        Seq(
-          PriceButton.Euro("50", priceButtonType),
-          PriceButton.Euro("100", priceButtonType),
-          PriceButton.Euro("150", priceButtonType),
-          PriceButton.Euro("200", priceButtonType),
-          PriceButton.Euro("250", priceButtonType),
-        ),
-        Seq(
-          PriceButton.Euro("300", priceButtonType),
-          PriceButton.Euro("350", priceButtonType),
-          PriceButton.Euro("400", priceButtonType),
-          PriceButton.Euro("450", priceButtonType),
-          PriceButton.Euro("500", priceButtonType),
-        ),
-        Seq(
-          AdviseButton.Return, PriceButton.Clear(priceButtonType)
-        ),
+        Seq(2, 3, 5, 10, 25).map(PriceButton.Euro(_, priceButtonType)),
+        Seq(50, 100, 150, 200, 250).map(PriceButton.Euro(_, priceButtonType)),
+        Seq(300, 350, 400, 450, 500).map(PriceButton.Euro(_, priceButtonType)),
+        Seq(AdviseButton.Return, PriceButton.Clear(priceButtonType)),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
+
+  val NoteMarkup: InlineKeyboardMarkup = {
+    InlineKeyboardMarkup(
+      Seq(
+        Seq(EditNoteButton.Name, EditNoteButton.Rating),
+        Seq(EditNoteButton.Price, EditNoteButton.Review),
+        Seq(NoteButton.Clear, NoteButton.Save),
       ).map(_.map(_.toKeyboardButton))
     )
   }

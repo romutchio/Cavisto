@@ -19,7 +19,8 @@ object PriceButton {
     val name: String = priceButtonType.name
   }
 
-  final case class Euro(override val name: String, priceButtonType: PriceButtonType) extends PriceButton(priceButtonType) {
+  final case class Euro(amount: Int, priceButtonType: PriceButtonType) extends PriceButton(priceButtonType) {
+    val name: String = amount.toString
     val emoji: Option[String] = Some("€")
   }
 

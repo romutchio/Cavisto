@@ -1,13 +1,14 @@
 package bot
 
-import bot.domain.AdviseState
+import bot.domain.states.State
 import com.bot4s.telegram.models.{CallbackQuery, Message}
+import cats.effect._
 
-trait PerChatState[F[_]] {
-  def withMessageState(f: F[AdviseState] => F[Unit])(implicit msg: Message, store: AdviseStateStore[F]): F[Unit] =
-    f(store.getMessageState)
+trait PerChatState[F[_], S <: State] {
+  def withMessageState(f: S => F[Unit])(implicit msg: Message, store: StateStore[F, S]): F[Unit] =
+    store.withMessageState(f)
 
-  def withCallbackState(f: F[AdviseState] => F[Unit])(implicit cbq: CallbackQuery, store: AdviseStateStore[F]): F[Unit] =
-    f(store.getCallbackState)
+  def withCallbackState(f: S => F[Unit])(implicit cbq: CallbackQuery, store: StateStore[F, S]): F[Unit] =
+    store.withCallbackState(f)
 
 }
