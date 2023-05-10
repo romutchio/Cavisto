@@ -8,10 +8,10 @@ case class AdviseState(
   wineType: Option[String],
   priceMin: Option[Int],
   priceMax: Option[Int],
-) extends State {
-  def getCountryCode: Option[CountryCode] = this.country.flatMap(CountryButton.withNameOption(_).map(_.countryCode))
+) extends State { self =>
+  def getCountryCode: Option[CountryCode] = self.country.flatMap(CountryButton.withNameOption(_).map(_.countryCode))
 
-  def getWineType: Option[WineType] = this.wineType.flatMap(WineTypeButton.withNameOption(_).map(_.wineType))
+  def getWineType: Option[WineType] = self.wineType.flatMap(WineTypeButton.withNameOption(_).map(_.wineType))
 }
 
 object AdviseState {

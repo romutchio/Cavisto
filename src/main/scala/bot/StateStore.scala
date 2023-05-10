@@ -19,9 +19,9 @@ class StateStore[F[_] : Sync, S <: State](store: Ref[F, Map[Long, S]], default: 
     } yield value
   }
 
-  def withMessageState(f: F[S] => F[Unit])(implicit msg: Message): F[Unit] = f(getMessageState)
+  def withMessageState(f: S => F[Unit])(implicit msg: Message): F[Unit] = getMessageState.flatMap(f)
 
-  def withCallbackState(f: F[S] => F[Unit])(implicit cbq: CallbackQuery): F[Unit] = f(getCallbackState)
+  def withCallbackState(f: S => F[Unit])(implicit cbq: CallbackQuery): F[Unit] = getCallbackState.flatMap(f)
 
 
   def getMessageState(implicit msg: Message): F[S] = {

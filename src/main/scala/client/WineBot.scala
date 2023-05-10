@@ -1,5 +1,6 @@
 package client
 
+import bot.domain.Commands
 import bot.domain.buttons._
 import bot.domain.states._
 import bot.{MessageFormatter, StateStore}
@@ -33,7 +34,7 @@ class WineBot[F[_] : Async](token: String)(
   implicit val perChatAdviseStateStore: StateStore[F, AdviseState] = adviseStateStore
   implicit val perChatNoteStateStore: StateStore[F, NoteState] = noteStateStore
 
-  onCommand("/start") {
+  onCommand(Commands.Start.command) {
     implicit msg =>
       for {
         msgFrom <- Async[F].delay(msg.from)
@@ -61,7 +62,18 @@ class WineBot[F[_] : Async](token: String)(
       } yield ()
   }
 
-  onRegex("""/search+\s(.+)""".r) {
+
+  onCommand(Commands.Help.command) {
+    implicit msg =>
+      for {
+        _ <- reply(
+          text = messageFormatter.getHelpMessage,
+          parseMode = ParseMode.Markdown,
+        ).void
+      } yield ()
+  }
+
+  onRegex(Commands.Search.regularExpression) {
     implicit msg => {
       case Seq(input: String) =>
         for {
@@ -89,12 +101,11 @@ class WineBot[F[_] : Async](token: String)(
     }
   }
 
-  onCommand("/advise") {
+  onCommand(Commands.Advise.command) {
     implicit msg =>
       perChatAdviseStateStore.withMessageState {
-        stateF =>
+        state =>
           for {
-            state <- stateF
             _ <- reply(
               messageFormatter.getAdviseStateMessage(state),
               replyMarkup = ButtonMarkup.AdviseMarkup,
@@ -106,13 +117,12 @@ class WineBot[F[_] : Async](token: String)(
 
   onCallbackWithTag(CountryButton.Selection.tag) { implicit cbq =>
     perChatAdviseStateStore.withCallbackState {
-      stateF =>
+      state =>
         for {
-          state <- stateF
           _ <- createCallback(
             CountryButton.Selection, ButtonMarkup.CountryMarkup,
             CountryButton.Clear, _ => state.copy(country = None),
-            x => _ => state.copy(country = x),
+            country => _ => state.copy(country = country),
           )
         } yield ()
     }
@@ -120,9 +130,8 @@ class WineBot[F[_] : Async](token: String)(
 
   onCallbackWithTag(WineTypeButton.Selection.tag) { implicit cbq =>
     perChatAdviseStateStore.withCallbackState {
-      stateF =>
+      state =>
         for {
-          state <- stateF
           _ <- createCallback(
             WineTypeButton.Selection, ButtonMarkup.WineTypeMarkup,
             WineTypeButton.Clear, _ => state.copy(wineType = None),
@@ -135,9 +144,8 @@ class WineBot[F[_] : Async](token: String)(
 
   onCallbackWithTag(PriceButtonType.Max.tag) { implicit cbq =>
     perChatAdviseStateStore.withCallbackState {
-      stateF =>
+      state =>
         for {
-          state <- stateF
           _ <- createCallback(
             PriceButton.Selection(PriceButtonType.Max), ButtonMarkup.PriceMaxMarkup,
             PriceButton.Clear(PriceButtonType.Max), _ => state.copy(priceMax = None),
@@ -149,9 +157,8 @@ class WineBot[F[_] : Async](token: String)(
 
   onCallbackWithTag(PriceButtonType.Min.tag) { implicit cbq =>
     perChatAdviseStateStore.withCallbackState {
-      stateF =>
+      state =>
         for {
-          state <- stateF
           _ <- createCallback(
             PriceButton.Selection(PriceButtonType.Min), ButtonMarkup.PriceMinMarkup,
             PriceButton.Clear(PriceButtonType.Min), _ => state.copy(priceMin = None),
@@ -162,29 +169,28 @@ class WineBot[F[_] : Async](token: String)(
   }
 
   onCallbackWithTag(AdviseButton.Clear.tag) { implicit cbq =>
-    perChatAdviseStateStore.withCallbackState { stateF =>
+    perChatAdviseStateStore.withCallbackState { _ =>
       for {
-        state <- perChatAdviseStateStore.setCallbackState(AdviseState.empty)
-        _ <- editAdviseStateMessage(messageFormatter.getAdviseStateMessage(state))
+        newState <- perChatAdviseStateStore.setCallbackState(AdviseState.empty)
+        _ <- editAdviseStateMessage(messageFormatter.getAdviseStateMessage(newState))
       } yield ()
     }
   }
 
   onCallbackWithTag(NoteButton.Clear.tag) { implicit cbq =>
-    perChatNoteStateStore.withCallbackState { stateF =>
+    perChatNoteStateStore.withCallbackState { state =>
       for {
-        state <- stateF
-        state <- perChatNoteStateStore.setCallbackState(
+        newState <- perChatNoteStateStore.setCallbackState(
           NoteState.empty.copy(messageId = state.messageId, messageSource = state.messageSource)
         )
-        _ <- editNoteStateMessage(state)
+        _ <- editNoteStateMessage(newState)
       } yield ()
     }
   }
 
 
   onCallbackWithTag(AdviseButton.Advise.tag) { implicit cbq =>
-    perChatAdviseStateStore.withCallbackState { stateF =>
+    perChatAdviseStateStore.withCallbackState { state =>
       val maybeEditFuture = for {
         data <- cbq.data
         msg <- cbq.message
@@ -194,7 +200,6 @@ class WineBot[F[_] : Async](token: String)(
 
           case x if x == AdviseButton.Advise.name =>
             for {
-              state <- stateF
               wines <- wineClient.adviseWine(
                 state.getCountryCode,
                 Euro,
@@ -227,12 +232,11 @@ class WineBot[F[_] : Async](token: String)(
     }
   }
 
-  onCommand("/note") {
+  onCommand(Commands.Note.command) {
     implicit msg =>
       perChatNoteStateStore.withMessageState {
-        stateF =>
+        state =>
           for {
-            state <- stateF
             replyMessage <- reply(
               messageFormatter.getNoteStateMessage(state),
               replyMarkup = ButtonMarkup.NoteMarkup,
@@ -262,9 +266,8 @@ class WineBot[F[_] : Async](token: String)(
 
   onMessage { implicit message =>
     perChatNoteStateStore.withMessageState {
-      stateF => {
+      state => {
         for {
-          state <- stateF
           _ <- state.status match {
             case AwaitingWineNameEdit => for {
               _ <- handleNoteStateEditMessage(
@@ -341,9 +344,8 @@ class WineBot[F[_] : Async](token: String)(
 
   onCallbackWithTag(NoteButton.Save.tag) { implicit cbq =>
     perChatNoteStateStore.withCallbackState {
-      stateF =>
+      state =>
         for {
-          state <- stateF
           getAndInsert <- for {
             userEitherOption <- databaseClient.getUser(cbq.from.id)
             userOption = userEitherOption.getOrElse(None)
