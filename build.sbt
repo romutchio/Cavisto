@@ -10,7 +10,7 @@ scalacOptions ++= Seq(
 
 val http4sVersion = "1.0.0-M39"
 val circeVersion = "0.14.1"
-val scalaTestVersion = "3.2.12"
+val scalaTestVersion = "3.2.15"
 val bot4sVersion = "5.6.3"
 val enumeratumVersion = "1.7.2"
 val doobieVersion = "1.0.0-RC1"
@@ -40,7 +40,8 @@ libraryDependencies ++= Seq(
 ).map(_ % circeVersion)
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % scalaTestVersion % Test
+  "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+  "org.scalamock" %% "scalamock" % "5.2.0" % Test,
 )
 
 libraryDependencies ++= Seq(

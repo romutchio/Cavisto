@@ -1,0 +1,92 @@
+{
+  "explore_vintage": {
+    "market": {
+      "country": "fr",
+      "currency": {
+        "code": "EUR",
+        "name": "Euros",
+        "prefix": "€",
+        "suffix": null
+      }
+    },
+    "records_matched": 35083,
+    "matches": [
+      {
+        "vintage": {
+          "id": 6803795,
+          "seo_name": "real-companhia-velha-colheita-port-1944",
+          "name": "Wine 1",
+          "statistics": {
+            "status": "Normal",
+            "ratings_count": 65,
+            "ratings_average": 4.9,
+            "labels_count": 802,
+            "wine_ratings_count": 321,
+            "wine_ratings_average": 1.0,
+            "wine_status": "Normal"
+          }
+        },
+        "price": {
+          "id": 11920896,
+          "amount": 1,
+          "currency": {
+            "code": "EUR",
+            "name": "Euros",
+            "prefix": "€",
+            "suffix": null
+          }
+        }
+      },
+      {
+        "vintage": {
+          "id": 6803795,
+          "seo_name": "real-companhia-velha-colheita-port-1944",
+          "name": "Wine 2",
+          "statistics": {
+            "status": "Normal",
+            "ratings_count": 65,
+            "ratings_average": 4.9,
+            "labels_count": 802,
+            "wine_ratings_count": 321,
+            "wine_ratings_average": 2.0,
+            "wine_status": "Normal"
+          }
+        },
+        "price": {
+          "id": 11920896,
+          "currency": {
+            "code": "EUR",
+            "name": "Euros",
+            "prefix": "€",
+            "suffix": null
+          }
+        }
+      },
+      {
+        "vintage": {
+          "id": 6803795,
+          "seo_name": "real-companhia-velha-colheita-port-1944",
+          "name": "Wine 3",
+          "statistics": {
+            "status": "Normal",
+            "ratings_count": 65,
+            "ratings_average": 4.9,
+            "labels_count": 802,
+            "wine_ratings_count": 321,
+            "wine_ratings_average": 3.0,
+            "wine_status": "Normal"
+          }
+        },
+        "price": {
+          "id": 11920896,
+          "currency": {
+            "code": "EUR",
+            "name": "Euros",
+            "prefix": "€",
+            "suffix": null
+          }
+        }
+      }
+    ]
+  }
+}
