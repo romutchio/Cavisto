@@ -5,10 +5,10 @@ import bot.domain.buttons.{CountryButton, WineTypeButton}
 import vivino.domain.{CountryCode, WineType}
 
 case class AdviseState(
-  country: Option[String],
-  wineType: Option[String],
-  priceMin: Option[Int],
-  priceMax: Option[Int],
+  country: Option[String] = None,
+  wineType: Option[String] = None,
+  priceMin: Option[Int] = None,
+  priceMax: Option[Int] = None,
 ) extends State { self =>
   def getCountryCode: Option[CountryCode] = self.country.flatMap(CountryButton.withNameOption(_).map(_.countryCode))
 

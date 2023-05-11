@@ -44,6 +44,8 @@ libraryDependencies ++= Seq(
   "org.scalamock" %% "scalamock" % "5.2.0" % Test,
 )
 
+Test / coverageEnabled := true
+
 libraryDependencies ++= Seq(
   "com.bot4s" %% "telegram-core",
 ).map(_ % bot4sVersion)
