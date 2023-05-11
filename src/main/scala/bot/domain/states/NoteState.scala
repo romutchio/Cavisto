@@ -1,5 +1,7 @@
 package bot.domain.states
 
+import bot.domain.State
+
 sealed trait NoteEditStatus
 
 case object AwaitingWineNameEdit extends NoteEditStatus

@@ -1,5 +1,6 @@
 package bot.domain.buttons
 
+import bot.domain.Button
 import enumeratum._
 import vivino.domain.CountryCode
 

@@ -1,6 +1,6 @@
 package bot
 
-import bot.domain.Commands
+import bot.domain.Command
 import bot.domain.states.{AdviseState, NoteState}
 import vivino.domain.Wine
 
@@ -8,7 +8,7 @@ import vivino.domain.Wine
 class MessageFormatter {
 
   private val commandList: String = {
-    Commands.values.map(c => s"${c.command} — ${c.description}").mkString("\n")
+    Command.values.map(c => s"${c.command} — ${c.description}").mkString("\n")
   }
 
   val getHelpMessage: String = {
@@ -86,7 +86,7 @@ class MessageFormatter {
     s"""
        |*Wine name*: ${noteState.wineName.getOrElse("...")}
        |*Rating*: ${noteState.rating.getOrElse("...")}
-       |*Price*: ${noteState.price.getOrElse("...")}
+       |*Price*: ${noteState.price.map(price => s"€ $price").getOrElse("...")}
        |*Review*: ${noteState.review.getOrElse("...")}
        |""".stripMargin
 

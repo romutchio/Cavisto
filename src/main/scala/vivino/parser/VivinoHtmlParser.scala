@@ -1,4 +1,4 @@
-package parser
+package vivino.parser
 
 import vivino.domain.Wine
 

@@ -4,9 +4,8 @@ import cats.effect.Async
 import cats.implicits._
 import client.HttpClient
 import io.circe.generic.auto._
-import models.{ExploreResponse, Match}
-import parser.VivinoHtmlParser
-import vivino.domain.{CountryCode, CurrencyCode, Wine, WineType}
+import vivino.domain.{CountryCode, CurrencyCode, ExploreResponse, Match, Wine, WineType}
+import vivino.parser.VivinoHtmlParser
 
 
 class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], httpClient: HttpClient[F]) extends WineClient[F] {

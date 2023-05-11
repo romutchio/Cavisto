@@ -1,5 +1,6 @@
 package bot.domain.states
 
+import bot.domain.State
 import bot.domain.buttons.{CountryButton, WineTypeButton}
 import vivino.domain.{CountryCode, WineType}
 

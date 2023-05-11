@@ -1,5 +1,7 @@
 package bot.domain.buttons
 
+import bot.domain.Button
+
 
 sealed class PriceButtonType(val name: String, val tag: String)
 

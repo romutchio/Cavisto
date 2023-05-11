@@ -1,4 +1,4 @@
-package bot.domain.buttons
+package bot.domain
 
 import com.bot4s.telegram.models.InlineKeyboardButton
 

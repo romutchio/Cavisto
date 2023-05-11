@@ -1,6 +1,6 @@
 package bot
 
-import bot.domain.states.State
+import bot.domain.State
 import cats.effect.{Ref, Sync}
 import cats.implicits._
 import com.bot4s.telegram.models.{CallbackQuery, Message}
