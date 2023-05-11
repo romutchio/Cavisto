@@ -14,4 +14,10 @@ jobs:
         with:
           java-version: 1.11
       - name: Run tests
-        run: sbt -Dsbt.log.noformat=true test
+        run: sbt -Dsbt.log.noformat=true coverage test
+      - name: Coverage Report
+        run: sbt coverageReport
+      - name: "Upload coverage to Codecov"
+        uses: "codecov/codecov-action@v2"
+        with:
+          fail_ci_if_error: true
