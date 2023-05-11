@@ -7,7 +7,6 @@ import client.HttpClient
 import cats.implicits._
 import cats.effect._
 import mocks.HttpClientMock
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import vivino.VivinoWineClient
@@ -17,7 +16,7 @@ import vivino.parser.JsoupVivinoHtmlParser
 
 import scala.io.Source
 
-class WineClientTest extends AnyFreeSpec with Matchers with MockFactory {
+class WineClientTest extends AnyFreeSpec with Matchers {
   def readFile(filename: String): String = {
     val src = Source.fromResource(filename)
     src.mkString
