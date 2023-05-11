@@ -1,4 +1,6 @@
 # Cavisto
+[![Scala CI](https://github.com/romutchio/Cavisto/actions/workflows/scala.yml/badge.svg)](https://github.com/romutchio/Cavisto/actions/workflows/scala.yml)
+[![codecov](https://codecov.io/gh/romutchio/Cavisto/branch/main/graph/badge.svg?token=Z2VUNNWO1I)](https://codecov.io/gh/romutchio/Cavisto)  
 Telegram bot for saving and advising wine
 
 Plan:
