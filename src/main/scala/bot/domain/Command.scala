@@ -8,7 +8,7 @@ sealed abstract class Command extends EnumEntry {
   val description: String
 }
 
-object Commands extends Enum[Command] {
+object Command extends Enum[Command] {
 
   case object Start extends Command {
     val command: String = "/start"

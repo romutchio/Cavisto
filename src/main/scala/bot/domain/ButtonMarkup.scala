@@ -1,5 +1,6 @@
-package bot.domain.buttons
+package bot.domain
 
+import bot.domain.buttons._
 import com.bot4s.telegram.models.InlineKeyboardMarkup
 
 object ButtonMarkup {

@@ -1,13 +1,11 @@
 package parser
 
 import org.scalatest.EitherValues
-//import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import io.circe.parser._
-import models.ExploreResponse
 import io.circe.generic.auto._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
+import vivino.domain.ExploreResponse
 
 import scala.io.Source
 

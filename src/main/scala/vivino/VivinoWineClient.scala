@@ -4,9 +4,8 @@ import cats.effect.Async
 import cats.implicits._
 import client.HttpClient
 import io.circe.generic.auto._
-import models.{ExploreResponse, Match}
-import parser.VivinoHtmlParser
-import vivino.domain.{CountryCode, CurrencyCode, Wine, WineType}
+import vivino.domain.{CountryCode, CurrencyCode, ExploreResponse, Match, Wine, WineType}
+import vivino.parser.VivinoHtmlParser
 
 
 class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], httpClient: HttpClient[F]) extends WineClient[F] {
@@ -17,8 +16,9 @@ class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], http
 
   private def wineFromMatch(m: Match): Wine = {
     val price = (m.price.currency.prefix, m.price.currency.suffix, m.price.amount) match {
-      case (Some(prefix), None, value) => Some(s"$prefix $value")
-      case (None, Some(suffix), value) => Some(s"$value $suffix")
+      case (_, _, None) => None
+      case (Some(prefix), None, Some(value)) => Some(s"$prefix $value")
+      case (None, Some(suffix), Some(value)) => Some(s"$value $suffix")
       case _ => None
     }
     Wine(
@@ -37,26 +37,20 @@ class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], http
     priceMax: Option[Int],
   ): F[List[Wine]]
   = {
-    val queryStr: Map[String, String] =
+    val query: Map[String, String] =
       List(
         Some(Map("currency_code" -> currencyCode.code, "order_by" -> "price", "order" -> "asc")),
-        countryCode.map(country => Map("country_code" -> country.code, "country_codes[]" -> country.code))
-      ).flatten.reduce(_ |+| _)
-
-
-    val queryInt: Map[String, Int] =
-      List(
-        Some(Map("page" -> 1)),
-        ratingMin.map(rating => Map("min_rating" -> rating)),
-        wineType.map(wine => Map("wine_type_ids[]" -> wine.id)),
-        priceMin.map(price => Map("price_range_min" -> price)),
-        priceMax.map(price => Map("price_range_max" -> price)),
+        countryCode.map(country => Map("country_code" -> country.code, "country_codes[]" -> country.code)),
+        Some(Map("page" -> "1")),
+        ratingMin.map(rating => Map("min_rating" -> rating.toString)),
+        wineType.map(wine => Map("wine_type_ids[]" -> wine.id.toString)),
+        priceMin.map(price => Map("price_range_min" -> price.toString)),
+        priceMax.map(price => Map("price_range_max" -> price.toString)),
       ).flatten.reduce(_ |+| _)
 
     httpClient.getJson[ExploreResponse](
       url = "https://www.vivino.com/api/explore/explore",
-      queryStr = queryStr,
-      queryInt = queryInt,
+      query = query,
     ).flatMap(resp => Async[F].delay(resp.explore_vintage.matches.map(wineFromMatch)))
   }
 }

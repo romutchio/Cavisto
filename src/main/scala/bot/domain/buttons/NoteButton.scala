@@ -1,5 +1,7 @@
 package bot.domain.buttons
 
+import bot.domain.Button
+
 sealed abstract class NoteButton extends Button {
   val tag: String = "Note_TAG"
 }

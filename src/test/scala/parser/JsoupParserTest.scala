@@ -5,6 +5,7 @@ import cats.effect.unsafe.implicits.global
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import vivino.domain.Wine
+import vivino.parser.JsoupVivinoHtmlParser
 
 import scala.io.Source
 

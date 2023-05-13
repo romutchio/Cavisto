@@ -1,6 +1,6 @@
 package bot
 
-import bot.domain.Commands
+import bot.domain.Command
 import bot.domain.states.{AdviseState, NoteState}
 import vivino.domain.Wine
 
@@ -8,12 +8,11 @@ import vivino.domain.Wine
 class MessageFormatter {
 
   private val commandList: String = {
-    Commands.values.map(c => s"${c.command} — ${c.description}").mkString("\n")
+    Command.values.map(c => s"${c.command} — ${c.description}").mkString("\n")
   }
 
   val getHelpMessage: String = {
-    s"""
-       |Cavisto is a wine assistant, that can:
+    s"""Cavisto is a wine assistant, that can:
        |- advise wine, using filters
        |- search wine by piece of info you know
        |- save notes about wine
@@ -29,8 +28,7 @@ class MessageFormatter {
       case (_, firstName, Some(last)) => s"$firstName $last"
       case (_, firstName, _) => firstName
     }
-    s"""
-       |*$name*, welcome to Cavisto bot.
+    s"""*$name*, welcome to Cavisto bot.
        |
        |_Available commands:_
        |$commandList
@@ -54,41 +52,31 @@ class MessageFormatter {
   }
 
   def getAdviseStateMessage(adviseState: AdviseState): String =
-    s"""
-       |Advise options:
+    s"""Advise options:
        |
-       |${adviseStateView(adviseState)}
-       |""".stripMargin
+       |${adviseStateView(adviseState)}""".stripMargin
 
   def getAdviseStateMessageWinesNotFound(adviseState: AdviseState): String =
-    s"""
-       |*Nothing was found* for selected options:
+    s"""*Nothing was found* for selected options:
        |
-       |${adviseStateView(adviseState)}
-       |""".stripMargin
+       |${adviseStateView(adviseState)}""".stripMargin
 
   def getNoteStateMessage(noteState: NoteState): String =
-    s"""
-       |Save your personal note about wine:
+    s"""Save your personal note about wine:
        |
-       |${noteStateView(noteState)}
-       |""".stripMargin
+       |${noteStateView(noteState)}""".stripMargin
 
-  private def adviseStateView(adviseState: AdviseState): String =
-    s"""
-       |*Country:* ${adviseState.country.getOrElse("...")}
+  def adviseStateView(adviseState: AdviseState): String =
+    s"""*Country:* ${adviseState.country.getOrElse("...")}
        |*Type:* ${adviseState.wineType.getOrElse("...")}
        |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("...")}
-       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}
-       |""".stripMargin
+       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}""".stripMargin
 
-  private def noteStateView(noteState: NoteState): String =
-    s"""
-       |*Wine name*: ${noteState.wineName.getOrElse("...")}
+  def noteStateView(noteState: NoteState): String =
+    s"""*Wine name*: ${noteState.wineName.getOrElse("...")}
        |*Rating*: ${noteState.rating.getOrElse("...")}
-       |*Price*: ${noteState.price.getOrElse("...")}
-       |*Review*: ${noteState.review.getOrElse("...")}
-       |""".stripMargin
+       |*Price*: ${noteState.price.map(price => s"€ $price").getOrElse("...")}
+       |*Review*: ${noteState.review.getOrElse("...")}""".stripMargin
 
   val getEditWineNameMessage = "OK. Send me the name of Wine."
 

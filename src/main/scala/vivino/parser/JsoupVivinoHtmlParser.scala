@@ -1,4 +1,4 @@
-package parser
+package vivino.parser
 
 import cats.effect.Sync
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser

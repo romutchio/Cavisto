@@ -1,10 +1,10 @@
 import bot.domain.states.{AdviseState, NoteState}
-import bot.{MessageFormatter, StateStore}
+import bot.{MessageFormatter, StateStore, WineBot}
 import cats.effect.{ExitCode, IO, IOApp}
-import client.{Http4sHttpClient, WineBot}
+import client.Http4sHttpClient
 import database.DoobieDatabaseClient
-import parser.JsoupVivinoHtmlParser
 import vivino.VivinoWineClient
+import vivino.parser.JsoupVivinoHtmlParser
 
 
 object Main extends IOApp {

@@ -1,8 +1,7 @@
 package bot
 
-import bot.domain.states.State
+import bot.domain.State
 import com.bot4s.telegram.models.{CallbackQuery, Message}
-import cats.effect._
 
 trait PerChatState[F[_], S <: State] {
   def withMessageState(f: S => F[Unit])(implicit msg: Message, store: StateStore[F, S]): F[Unit] =

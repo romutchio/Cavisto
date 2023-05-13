@@ -18,12 +18,10 @@ class Http4sHttpClient[F[_] : Async] extends HttpClient[F] {
     client.fetchAs[String](r)
   }
 
-  def getJson[T: Decoder](url: String, queryStr: Map[String, String], queryInt: Map[String, Int]): F[T] = {
+  def getJson[T : Decoder](url: String, query: Map[String, String]): F[T] = {
     val r = Request[F](
       method = Method.GET,
-      uri = Uri.unsafeFromString(url)
-        .withQueryParams(queryStr)
-        .withQueryParams(queryInt),
+      uri = Uri.unsafeFromString(url).withQueryParams(query),
       headers = Headers(
         Accept(MediaType.application.json),
       )
