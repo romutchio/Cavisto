@@ -418,7 +418,7 @@ class WineBot[F[_] : Async](token: String)(
             case NotesButtons.Previous.name => (x: Int) => x - 1
           }
           noteListState <- state.notesListState
-          page <- nextPage(noteListState.noteIdx)
+          page <- nextPage(noteListState.pageNumber)
           startFrom = page * 10
           notes <- Async[F].pure(noteListState.notes.slice(startFrom, startFrom + 10))
           _ <- notes match {
@@ -432,7 +432,7 @@ class WineBot[F[_] : Async](token: String)(
                   replyMarkup = ButtonMarkup.NotesMarkup(notes, page, Command.Notes.notesMaxCount),
                 )
               ).void
-              _ <- perChatNoteStateStore.setCallbackState(state.updateNoteListState(noteIdx = page))
+              _ <- perChatNoteStateStore.setCallbackState(state.updateNoteListState(pageNumber = page))
             } yield ()
             case Nil => for {
               _ <- ackCallback(messageFormatter.getNotesOutOfBoundaryErrorMessage)
@@ -491,7 +491,7 @@ class WineBot[F[_] : Async](token: String)(
           }
           _ <- noteListStateOption match {
             case Some(noteListState) => for {
-              page <- Async[F].pure(noteListState.noteIdx)
+              page <- Async[F].pure(noteListState.pageNumber)
               startFrom = page * 10
               notes = noteListState.notes.slice(startFrom, startFrom + 10)
               _ <- request(

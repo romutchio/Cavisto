@@ -16,7 +16,7 @@ case object AwaitingRatingEdit extends NoteEditStatus
 case object Empty extends NoteEditStatus
 
 case class EditMessageState(messageSource: Option[Long] = None, messageId: Option[Int] = None, noteDbId: Option[Long] = None)
-case class NotesListState(notes: List[Note] = Nil, noteIdx: Int = 0)
+case class NotesListState(notes: List[Note] = Nil, pageNumber: Int = 0)
 
 case class NoteState(
   wineName: Option[String] = None,
@@ -39,11 +39,11 @@ case class NoteState(
     )
   }
 
-  def updateNoteListState(notes: Option[List[Note]] = None, noteIdx: Option[Int] = None): NoteState = {
+  def updateNoteListState(notes: Option[List[Note]] = None, pageNumber: Option[Int] = None): NoteState = {
     val notesListState = self.notesListState.getOrElse(NotesListState.empty)
     val updatedState = notesListState.copy(
       notes = notes.getOrElse(notesListState.notes),
-      noteIdx = noteIdx.getOrElse(notesListState.noteIdx),
+      pageNumber = pageNumber.getOrElse(notesListState.pageNumber),
     )
     self.copy(
       notesListState = Some(updatedState),
