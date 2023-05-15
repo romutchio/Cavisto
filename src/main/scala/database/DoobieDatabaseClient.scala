@@ -2,7 +2,7 @@ package database
 
 import bot.domain.states.AdviseState
 import cats.effect.Async
-import database.domain.{AdviseHistory, User}
+import database.domain.{AdviseHistory, Note, User}
 import doobie.implicits._
 import doobie.postgres.circe.jsonb.implicits.{pgDecoderGet, pgEncoderPut}
 import doobie.util.transactor.Transactor.Aux
@@ -49,6 +49,17 @@ class DoobieDatabaseClient[F[_] : Async] extends DatabaseClient[F] {
       case _ => "Error"
     }
 
+  def getNotes(user_id: Long): F[Either[String, List[Note]]] =
+    sql"select id, user_id, wine_name, rating, price, review from notes where user_id = $user_id order by created_at"
+      .query[Note].to[List].transact(transactor).attemptSomeSqlState {
+      case _ => "Error"
+    }
+
+  def updateNote(id: Long, wine_name: String, rating: Option[Double], price: Option[Double], review: Option[String]): F[Either[String, Int]] =
+    sql"update notes set wine_name = $wine_name, rating = $rating, price = $price, review = $review where id = $id"
+      .update.run.transact(transactor).attemptSomeSqlState {
+      case _ => "Error"
+    }
 }
 
 object DoobieDatabaseClient {

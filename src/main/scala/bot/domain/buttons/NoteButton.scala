@@ -45,4 +45,10 @@ object NoteButton {
     val name: String = "Clear"
   }
 
+  final case object Return extends Button {
+    val tag: String = "NoteReturn_TAG"
+    val emoji: Option[String] = None
+    val name: String = "Return to notes"
+  }
+
 }

@@ -2,6 +2,7 @@ package bot.domain
 
 import bot.domain.buttons._
 import com.bot4s.telegram.models.InlineKeyboardMarkup
+import database.domain.Note
 
 object ButtonMarkup {
   val AdviseMarkup: InlineKeyboardMarkup = {
@@ -54,7 +55,25 @@ object ButtonMarkup {
       Seq(
         Seq(EditNoteButton.Name, EditNoteButton.Rating),
         Seq(EditNoteButton.Price, EditNoteButton.Review),
-        Seq(NoteButton.Clear, NoteButton.Save),
+        Seq(NoteButton.Return, NoteButton.Clear),
+        Seq(NoteButton.Save),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
+
+  def NotesMarkup(notes: List[Note], page: Int, notesCount: Int): InlineKeyboardMarkup = {
+    val startWith = page * notesCount
+    val halfNotesCount = notesCount / 2
+    val buttons: (List[(Note, Int)], List[(Note, Int)]) = notes match {
+      case x if x.length > halfNotesCount
+      => notes.zip(LazyList.from(startWith)).partition { case (_, i) => i < halfNotesCount }
+      case _ => (Nil, notes.zip(LazyList.from(startWith)))
+    }
+    InlineKeyboardMarkup(
+      Seq(
+        buttons._1.map { case (_, idx) => NotesButtons.NoteId(idx) },
+        buttons._2.map { case (_, idx) => NotesButtons.NoteId(idx) },
+        Seq(NotesButtons.Previous, NotesButtons.Next),
       ).map(_.map(_.toKeyboardButton))
     )
   }

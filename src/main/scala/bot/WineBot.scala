@@ -12,6 +12,7 @@ import com.bot4s.telegram.cats.{Polling, TelegramBot}
 import com.bot4s.telegram.methods.{EditMessageReplyMarkup, EditMessageText, ParseMode, SendMessage}
 import com.bot4s.telegram.models.{CallbackQuery, ChatId, InlineKeyboardMarkup, Message}
 import database.DatabaseClient
+import database.domain.Note
 import org.asynchttpclient.Dsl.asyncHttpClient
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import vivino.WineClient
@@ -167,6 +168,14 @@ class WineBot[F[_] : Async](token: String)(
     }
   }
 
+  onCallbackWithTag(AdviseButton.Return.tag) { implicit cbq =>
+    val editFuture = for {
+      msg <- cbq.message
+      _ <- editMarkup(msg, ButtonMarkup.AdviseMarkup)
+    } yield ()
+    editFuture.getOrElse(Async[F].pure()).void
+  }
+
   onCallbackWithTag(AdviseButton.Clear.tag) { implicit cbq =>
     perChatAdviseStateStore.withCallbackState { _ =>
       for {
@@ -179,38 +188,32 @@ class WineBot[F[_] : Async](token: String)(
   onCallbackWithTag(AdviseButton.Advise.tag) { implicit cbq =>
     perChatAdviseStateStore.withCallbackState { state =>
       val maybeEditFuture = for {
-        data <- cbq.data
-        msg <- cbq.message
-        _ <- data match {
-          case x if x == AdviseButton.Return.name => editMarkup(msg, ButtonMarkup.AdviseMarkup)
-          case x if x == AdviseButton.Advise.name =>
-            for {
-              wines <- wineClient.adviseWine(
-                state.getCountryCode,
-                Euro,
-                state.getWineType,
-                3,
-                state.priceMin,
-                state.priceMax
-              )
-              _ <- wines match {
-                case _ :: _ => editAdviseStateMessage(messageFormatter.getWinesFoundMessage(wines))
-                case Nil => editAdviseStateMessage(messageFormatter.getAdviseStateMessageWinesNotFound(state))
-              }
-              getAndInsert <- for {
-                userEitherOption <- databaseClient.getUser(cbq.from.id)
-                userOption = userEitherOption.getOrElse(None)
-                result = userOption
-                  .map(user => databaseClient.insertAdviseHistory(user.user_id, state))
-                  .getOrElse(Async[F].pure(Left()))
-              } yield result
-              dbResult <- getAndInsert
-              _ <- dbResult match {
-                case Left(_) => ackCallback(messageFormatter.getAdviseHistorySavedErrorMessage)
-                case Right(_) => Async[F].pure()
-              }
-            } yield ()
-        }
+        _ <- for {
+          wines <- wineClient.adviseWine(
+            state.getCountryCode,
+            Euro,
+            state.getWineType,
+            3,
+            state.priceMin,
+            state.priceMax
+          )
+          _ <- wines match {
+            case _ :: _ => editAdviseStateMessage(messageFormatter.getWinesFoundMessage(wines))
+            case Nil => editAdviseStateMessage(messageFormatter.getAdviseStateMessageWinesNotFound(state))
+          }
+          getAndInsert <- for {
+            userEitherOption <- databaseClient.getUser(cbq.from.id)
+            userOption = userEitherOption.getOrElse(None)
+            result = userOption
+              .map(user => databaseClient.insertAdviseHistory(user.user_id, state))
+              .getOrElse(Async[F].pure(Left()))
+          } yield result
+          dbResult <- getAndInsert
+          _ <- dbResult match {
+            case Left(_) => ackCallback(messageFormatter.getAdviseHistorySavedErrorMessage)
+            case Right(_) => Async[F].pure()
+          }
+        } yield ()
       } yield ()
 
       maybeEditFuture.getOrElse(Async[F].pure()).void
@@ -228,7 +231,7 @@ class WineBot[F[_] : Async](token: String)(
               parseMode = ParseMode.Markdown,
             )
             _ <- perChatNoteStateStore.setMessageState(
-              state.copy(messageId = replyMessage.messageId, messageSource = replyMessage.source)
+              state.updateMessageState(messageSource = replyMessage.source, messageId = replyMessage.messageId)
             )
           } yield ()
       }
@@ -323,8 +326,13 @@ class WineBot[F[_] : Async](token: String)(
             userOption = userEitherOption.getOrElse(None)
             result = userOption
               .map(
-                user =>
-                  databaseClient.insertNote(user.user_id, state.wineName.getOrElse("-"), state.rating, state.price, state.review)
+                user => state.editMessageState match {
+                  case Some(editMessageState) => editMessageState.noteDbId match {
+                    case Some(noteId) => databaseClient.updateNote(noteId, state.wineName.getOrElse("-"), state.rating, state.price, state.review)
+                    case None => databaseClient.insertNote(user.user_id, state.wineName.getOrElse("-"), state.rating, state.price, state.review)
+                  }
+                  case None => Async[F].pure()
+                }
               )
               .getOrElse(Async[F].pure(Left()))
           } yield result
@@ -332,13 +340,17 @@ class WineBot[F[_] : Async](token: String)(
           _ <- dbResult match {
             case Left(_) => ackCallback(messageFormatter.getNoteSavedErrorMessage)
             case Right(_) => for {
-              _ <- request(
-                EditMessageReplyMarkup(
-                  ChatId(state.messageSource),
-                  state.messageId,
-                  replyMarkup = None,
-                )
-              ).void
+              editMessageStateOption <- Async[F].pure(state.editMessageState)
+              _ <- editMessageStateOption match {
+                case Some(editMessageState) => request(
+                  EditMessageReplyMarkup(
+                    ChatId(editMessageState.messageSource.get),
+                    editMessageState.messageId,
+                    replyMarkup = None,
+                  )
+                ).void
+                case None => Async[F].pure()
+              }
               _ <- ackCallback(messageFormatter.getNoteSavedMessage(state.wineName.getOrElse("-")))
               _ <- perChatNoteStateStore.setCallbackState(NoteState.empty)
             } yield ()
@@ -351,10 +363,152 @@ class WineBot[F[_] : Async](token: String)(
     perChatNoteStateStore.withCallbackState { state =>
       for {
         newState <- perChatNoteStateStore.setCallbackState(
-          NoteState.empty.copy(messageId = state.messageId, messageSource = state.messageSource)
+          NoteState.empty.copy(editMessageState = state.editMessageState)
         )
-        _ <- editNoteStateMessage(newState)
+        _ <- editNoteStateMessage(newState).getOrElse(Async[F].pure())
       } yield ()
+    }
+  }
+
+  private def getUserNotes(telegramId: Long): F[Either[String, List[Note]]] = for {
+    userEitherOption <- databaseClient.getUser(telegram_id = telegramId)
+    userOption = userEitherOption.getOrElse(None)
+    result <- userOption match {
+      case Some(user) => databaseClient.getNotes(user.user_id)
+      case None => Async[F].pure(Left("Error"))
+    }
+  } yield result
+
+  onCommand(Command.Notes.command) {
+    implicit msg =>
+      perChatNoteStateStore.withMessageState {
+        state =>
+          for {
+            msgFrom <- Async[F].delay(msg.from)
+            telegramUser = msgFrom.get
+            notesEither <- getUserNotes(telegramUser.id)
+            _ <- notesEither match {
+              case Left(_) => reply(
+                text = messageFormatter.getNotesErrorMessage,
+                parseMode = ParseMode.Markdown,
+              ).void
+              case Right(notes) => for {
+                _ <- perChatNoteStateStore.setMessageState(
+                  state.updateNoteListState(notes, 0)
+                )
+                notesTrimmed = notes.take(Command.Notes.notesMaxCount)
+                _ <- reply(
+                  text = messageFormatter.getNotesList(notesTrimmed, 0),
+                  parseMode = ParseMode.Markdown,
+                  replyMarkup = ButtonMarkup.NotesMarkup(notesTrimmed, 0, Command.Notes.notesMaxCount),
+                ).void
+              } yield ()
+            }
+          } yield ()
+      }
+  }
+
+  onCallbackWithTag(NotesButtons.ControlButtonsTag) { implicit cbq =>
+    perChatNoteStateStore.withCallbackState {
+      state =>
+        val editFuture = for {
+          data <- cbq.data
+          nextPage = data match {
+            case NotesButtons.Next.name => (x: Int) => x + 1
+            case NotesButtons.Previous.name => (x: Int) => x - 1
+          }
+          noteListState <- state.notesListState
+          page <- nextPage(noteListState.noteIdx)
+          startFrom = page * 10
+          notes <- Async[F].pure(noteListState.notes.slice(startFrom, startFrom + 10))
+          _ <- notes match {
+            case _ :: _ => for {
+              _ <- request(
+                EditMessageText(
+                  ChatId(cbq.message.get.source),
+                  cbq.message.get.messageId,
+                  text = messageFormatter.getNotesList(notes, page),
+                  parseMode = ParseMode.Markdown,
+                  replyMarkup = ButtonMarkup.NotesMarkup(notes, page, Command.Notes.notesMaxCount),
+                )
+              ).void
+              _ <- perChatNoteStateStore.setCallbackState(state.updateNoteListState(noteIdx = page))
+            } yield ()
+            case Nil => for {
+              _ <- ackCallback(messageFormatter.getNotesOutOfBoundaryErrorMessage)
+            } yield ()
+          }
+        } yield ()
+        editFuture.getOrElse(Async[F].pure()).void
+    }
+  }
+
+  onCallbackWithTag(NotesButtons.SelectNotesTag) { implicit cbq =>
+    perChatNoteStateStore.withCallbackState {
+      state =>
+        val editFuture = for {
+          source <- cbq.message.get.source
+          messageId <- cbq.message.get.messageId
+          noteId <- cbq.data.map(_.toInt)
+          noteListState <- state.notesListState
+          note <- noteListState.notes(noteId)
+          state <- perChatNoteStateStore.setCallbackState(state.fromNote(note))
+          _ <- request(
+            EditMessageText(
+              chatId = ChatId(source),
+              messageId = messageId,
+              text = messageFormatter.getNoteStateMessage(state),
+              replyMarkup = ButtonMarkup.NoteMarkup,
+              parseMode = ParseMode.Markdown,
+            )
+          )
+          _ <- perChatNoteStateStore.setCallbackState(
+            state.updateMessageState(source, messageId, note.id)
+          )
+        } yield ()
+        editFuture.getOrElse(Async[F].pure()).void
+    }
+  }
+
+  onCallbackWithTag(NoteButton.Return.tag) { implicit cbq =>
+    perChatNoteStateStore.withCallbackState {
+      state =>
+        val editFuture = for {
+          telegramId <- cbq.from.id
+          noteListStateOption <- state.notesListState match {
+            case state@Some(_) => Async[F].pure(state)
+            case none@None => for {
+              notesEither <- getUserNotes(telegramId)
+              res <- notesEither match {
+                case Left(_) => Async[F].pure(none)
+                case Right(notes) => for {
+                  newState <- perChatNoteStateStore.setCallbackState(
+                    state.updateNoteListState(notes, 0)
+                  )
+                } yield newState.notesListState
+              }
+            } yield res
+          }
+          _ <- noteListStateOption match {
+            case Some(noteListState) => for {
+              page <- Async[F].pure(noteListState.noteIdx)
+              startFrom = page * 10
+              notes = noteListState.notes.slice(startFrom, startFrom + 10)
+              _ <- request(
+                EditMessageText(
+                  ChatId(cbq.message.get.source),
+                  cbq.message.get.messageId,
+                  text = messageFormatter.getNotesList(notes, page),
+                  parseMode = ParseMode.Markdown,
+                  replyMarkup = ButtonMarkup.NotesMarkup(notes, page, Command.Notes.notesMaxCount),
+                )
+              ).void
+            } yield ()
+            case None => Async[F].delay(ackCallback(messageFormatter.getNotesErrorMessage))
+          }
+        } yield ()
+
+        editFuture.getOrElse(Async[F].pure())
     }
   }
 
@@ -369,7 +523,7 @@ class WineBot[F[_] : Async](token: String)(
         )
       ).void
       state <- perChatNoteStateStore.getMessageState
-      _ <- editNoteStateMessage(state)
+      _ <- editNoteStateMessage(state).getOrElse(Async[F].pure())
       _ <- perChatNoteStateStore.setMessageState(state.copy(status = Empty))
     } yield ()
 
@@ -433,16 +587,20 @@ class WineBot[F[_] : Async](token: String)(
     )
   }
 
-  private def editNoteStateMessage(state: NoteState) =
-    request(
-      EditMessageText(
-        ChatId(state.messageSource),
-        state.messageId,
-        text = messageFormatter.getNoteStateMessage(state),
-        replyMarkup = ButtonMarkup.NoteMarkup,
-        parseMode = ParseMode.Markdown,
-      )
-    ).void
+  private def editNoteStateMessage(state: NoteState) = {
+    for {
+      editMessageState <- state.editMessageState
+      _ <- request(
+        EditMessageText(
+          ChatId(editMessageState.messageSource.get),
+          editMessageState.messageId,
+          text = messageFormatter.getNoteStateMessage(state),
+          replyMarkup = ButtonMarkup.NoteMarkup,
+          parseMode = ParseMode.Markdown,
+        )
+      ).void
+    } yield ()
+  }
 }
 
 
