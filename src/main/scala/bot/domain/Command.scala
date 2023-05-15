@@ -36,5 +36,10 @@ object Command extends Enum[Command] {
     val description: String = "Create a note about wine."
   }
 
+  case object Notes extends Command {
+    val command: String = "/notes"
+    val description: String = "Display all wine notes."
+    val notesMaxCount: Int = 10
+  }
   override def values: IndexedSeq[Command] = findValues
 }

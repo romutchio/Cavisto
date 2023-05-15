@@ -2,6 +2,7 @@ package bot
 
 import bot.domain.Command
 import bot.domain.states.{AdviseState, NoteState}
+import database.domain.Note
 import vivino.domain.Wine
 
 
@@ -21,7 +22,6 @@ class MessageFormatter {
        |$commandList
        |""".stripMargin
   }
-
   def getWelcomeMessage(username: Option[String], firstName: String, lastName: Option[String]): String = {
     val name = (username, firstName, lastName) match {
       case (Some(user), _, _) => user
@@ -78,6 +78,23 @@ class MessageFormatter {
        |*Price*: ${noteState.price.map(price => s"€ $price").getOrElse("...")}
        |*Review*: ${noteState.review.getOrElse("...")}""".stripMargin
 
+  def noteView(idx: Int, note: Note): String =
+    s"$idx. " +
+      s"*Name*: ${note.wine_name.getOrElse("...")}, " +
+      s"*rating*: ${note.rating.getOrElse("...")}, " +
+      s"*price*: ${note.price.map(price => s"€ $price").getOrElse("...")} "
+
+  def notesList(notes: List[Note], startWith: Int): String =
+    notes.zipWithIndex.map {case (note, id) => noteView(startWith + id, note)}.mkString("\n")
+  def getNotesList(notes: List[Note], pageNumber: Int, onPage: Int = 10): String = {
+    val startWith = pageNumber * onPage
+    s"""*Personal notes*
+       |
+       |${notesList(notes, startWith)}
+       |
+       |_Current page: ${pageNumber}_""".stripMargin
+  }
+
   val getEditWineNameMessage = "OK. Send me the name of Wine."
 
   val getEditReviewMessage = "OK. Send me the new 'Review' text."
@@ -95,6 +112,10 @@ class MessageFormatter {
   val getAdviseHistorySavedErrorMessage = "Advise history was not saved."
 
   val getUserSavedErrorMessage = "Error, saving user info. Try again later."
+
+  val getNotesErrorMessage = "Error, getting notes. Try again later."
+
+  val getNotesOutOfBoundaryErrorMessage = "No more notes to display."
 
 }
 
