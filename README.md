@@ -62,4 +62,4 @@ Detailed Plan:
   - [x] Implement '/advise' command
   - [x] Implement '/note' command
   - [x] Implement '/search' command
-  - []  Implement '/notes' command 
+  - [x]  Implement '/notes' command 
