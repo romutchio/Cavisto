@@ -63,44 +63,44 @@ Telegram bot for saving and advising wine
 
 
 ### Commands' showcase:
-- `/start`
-  ![](./docs/command_start.png)
+- `/start`  
+  <img src="docs/command_start.png" width=400>  
 
-- `/help`
-  ![](./docs/command_help.png)  
+- `/help`  
+  <img src="docs/command_help.png" width=400>  
 
-- `/advise`
-  ![](docs/command_advise_init.png)
-  - `Country` button
-  ![](docs/command_advise_country.png)
-  - `Type` button
-  ![](docs/command_advise_type.png)
-  - `Price` buttons
-  ![](docs/command_advise_price.png)
-  - `Advise` button
-  ![](docs/command_advise_advise.png)
-  - `Next` button
-  ![](docs/command_advise_next.png)
+- `/advise`  
+  <img src="docs/command_advise_init.png" width=400>     
+  - `Country` button   
+    <img src="docs/command_advise_country.png" width=400>  
+  - `Type` button   
+    <img src="docs/command_advise_type.png" width=400>  
+  - `Price` buttons  
+    <img src="docs/command_advise_price.png" width=400>  
+  - `Advise` button  
+    <img src="docs/command_advise_advise.png" width=400>  
+  - `Next` button  
+    <img src="docs/command_advise_next.png" width=400>  
 
-- `/note`
-  ![](docs/command_note_init.png)
-  - `Edit wine name` button
-  ![](docs/command_note_edit_wine_name.png)
-  - `Edit Rating` button
-  ![](docs/command_note_edit_rating.png)
-  - `Edit Review` button
-  ![](docs/command_note_edit_review.png)
-  - `Save` button
-  ![](docs/command_note_save.png)
+- `/note`  
+  <img src="docs/command_note_init.png" width=400>  
+  - `Edit wine name` button  
+    <img src="docs/command_note_edit_wine_name.png" width=400>  
+  - `Edit Rating` button  
+    <img src="docs/command_note_edit_rating.png" width=400>  
+  - `Edit Review` button  
+    <img src="docs/command_note_edit_review.png" width=400>  
+  - `Save` button  
+    <img src="docs/command_note_save.png" width=400>  
 
 - `/notes`  
-  - User's list of notes is empty
-  ![](docs/command_notes_init.png)
-  - User's list of notes is not empty (max 10 on page)
-  ![](docs/command_notes_page_0.png)
-  ![](docs/command_notes_page_1.png)
-  - `10` button click (You can edit note)
-  ![](docs/command_notes_edit.png)
+  - User's list of notes is empty  
+    <img src="docs/command_notes_init.png" width=400>  
+  - User's list of notes is not empty (max 10 on page)   
+    <img src="docs/command_notes_page_0.png" width=400>  
+    <img src="docs/command_notes_page_1.png" width=400>  
+  - `10` button click (You can edit note)  
+    <img src="docs/command_notes_edit.png" width=400>  
 
-- `/search cabernet`
-  ![](docs/command_search_cabernet.png)
+- `/search cabernet`  
+  <img src="docs/command_search_cabernet.png" width=400>
