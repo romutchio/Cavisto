@@ -12,23 +12,26 @@ class MessageFormatterTest extends AnyFreeSpec with Matchers {
 
   "MessageFormatter" - {
     "getWineMessage" - {
-      "single" in {
-        val wines = List(Wine("Wine 1"))
-        val expected = "*Wine 1* _Price: ..._ _Rating: ..._"
-        messageFormatter.getWinesFoundMessage(wines) shouldBe expected
+      "only name" in {
+        val wine = Wine("Wine 1")
+        val expected =
+          """Found 1 wines:
+            |
+            |0. *Wine 1*
+            |_Price: ..._
+            |_Rating: ..._""".stripMargin
+        messageFormatter.getWineMessage(wine, 0, 1) shouldBe expected
       }
 
-      "multiple" in {
-        val wines = List(
-          Wine("Wine 1", rating = Some(3.2), price = Some("42.12")),
-          Wine("Wine 2", rating = None, price = Some("12.23")),
-          Wine("Wine 3", rating = Some(4.7), None),
-        )
+      "full" in {
+        val wine = Wine("Wine 1", rating = Some(3.2), price = Some("42.12"), url=Some("https://some/url.png"))
         val expected =
-          """*Wine 1* _Price: 42.12_ _Rating: 3.2_
-            |*Wine 2* _Price: 12.23_ _Rating: ..._
-            |*Wine 3* _Price: ..._ _Rating: 4.7_""".stripMargin
-        messageFormatter.getWinesFoundMessage(wines) shouldBe expected
+          """Found 1 wines:
+            |[​](https://some/url.png)
+            |0. *Wine 1*
+            |_Price: 42.12_
+            |_Rating: 3.2_""".stripMargin
+        messageFormatter.getWineMessage(wine, 0, 1) shouldBe expected
       }
     }
 

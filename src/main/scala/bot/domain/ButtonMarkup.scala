@@ -61,6 +61,22 @@ object ButtonMarkup {
     )
   }
 
+  val SearchNavigationMarkup: InlineKeyboardMarkup = {
+    InlineKeyboardMarkup(
+      Seq(
+        Seq(SearchButton.Previous, SearchButton.Next),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
+
+  val AdviseNavigationMarkup: InlineKeyboardMarkup = {
+    InlineKeyboardMarkup(
+      Seq(
+        Seq(AdviseButton.Previous, AdviseButton.Next),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
+
   def NotesMarkup(notes: List[Note], page: Int, notesCount: Int): InlineKeyboardMarkup = {
     val startWith = page * notesCount
     val halfNotesCount = notesCount / 2

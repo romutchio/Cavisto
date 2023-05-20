@@ -39,12 +39,16 @@ class MessageFormatter {
     s"Searching for: _${input}_"
   }
 
-  def getWinesFoundMessage(wines: List[Wine]): String = wines.map(getWineMessage).mkString("\n")
-
-  private def getWineMessage(wine: Wine): String = {
+  def getWineMessage(wine: Wine, wineId: Int, winesCount: Int): String = {
     val price = wine.price.getOrElse("...")
     val rating = wine.rating.map(_.toString).getOrElse("...")
-    s"*${wine.name}* _Price: ${price}_ _Rating: ${rating}_"
+    val imageUrl = wine.url.map(url => s"[​]($url)").getOrElse("")
+
+    s"""Found $winesCount wines:
+      |$imageUrl
+      |$wineId. *${wine.name}*
+      |_Price: ${price}_
+      |_Rating: ${rating}_""".stripMargin
   }
 
   def getWinesNotFoundMessage(input: String): String = {
@@ -116,6 +120,8 @@ class MessageFormatter {
   val getNotesErrorMessage = "Error, getting notes. Try again later."
 
   val getNotesOutOfBoundaryErrorMessage = "No more notes to display."
+
+  val getWinesOutOfBoundaryErrorMessage = "No more wines to display."
 
 }
 

@@ -23,6 +23,7 @@ class WineBot[F[_] : Async](token: String)(
   messageFormatter: MessageFormatter,
   adviseStateStore: StateStore[F, AdviseState],
   noteStateStore: StateStore[F, NoteState],
+  searchStateStore: StateStore[F, WineListState],
   databaseClient: DatabaseClient[F],
 )
   extends TelegramBot[F](token, AsyncHttpClientCatsBackend.usingClient[F](asyncHttpClient()))
@@ -33,6 +34,7 @@ class WineBot[F[_] : Async](token: String)(
 
   implicit val perChatAdviseStateStore: StateStore[F, AdviseState] = adviseStateStore
   implicit val perChatNoteStateStore: StateStore[F, NoteState] = noteStateStore
+  implicit val perChatSearchStateStore: StateStore[F, WineListState] = searchStateStore
 
   onCommand(Command.Start.command) {
     implicit msg =>
@@ -79,12 +81,14 @@ class WineBot[F[_] : Async](token: String)(
         for {
           m <- replyMd(messageFormatter.getSearchWinesMessage(input), replyToMessageId = msg.messageId)
           wines <- wineClient.getWinesByName(input)
+          _ <- perChatSearchStateStore.setMessageState(WineListState(wines))
           _ <- wines match {
             case _ :: _ => request(
               EditMessageText(
                 ChatId(m.source),
                 m.messageId,
-                text = messageFormatter.getWinesFoundMessage(wines),
+                text = messageFormatter.getWineMessage(wines.head, 0, wines.length),
+                replyMarkup = ButtonMarkup.SearchNavigationMarkup,
                 parseMode = ParseMode.Markdown,
               )
             )
@@ -197,8 +201,13 @@ class WineBot[F[_] : Async](token: String)(
             state.priceMin,
             state.priceMax
           )
+          _ <- perChatAdviseStateStore.setCallbackState(
+            state.updateWineListState(wines, 0)
+          )
           _ <- wines match {
-            case _ :: _ => editAdviseStateMessage(messageFormatter.getWinesFoundMessage(wines))
+            case _ :: _ => editAdviseStateMessage(
+              messageFormatter.getWineMessage(wines.head, 0, wines.length), ButtonMarkup.AdviseNavigationMarkup
+            )
             case Nil => editAdviseStateMessage(messageFormatter.getAdviseStateMessageWinesNotFound(state))
           }
           getAndInsert <- for {
@@ -217,6 +226,65 @@ class WineBot[F[_] : Async](token: String)(
       } yield ()
 
       maybeEditFuture.getOrElse(Async[F].pure()).void
+    }
+  }
+
+
+  onCallbackWithTag(AdviseButton.ControlButtonsTag) { implicit cbq =>
+    perChatAdviseStateStore.withCallbackState {
+      state =>
+        val editFuture = for {
+          data <- cbq.data
+          nextWine = data match {
+            case AdviseButton.Next.name => (x: Int) => x + 1
+            case AdviseButton.Previous.name => (x: Int) => x - 1
+          }
+          wineListState <- state.wineListState
+          wineId <- nextWine(wineListState.wineId)
+          wineOption <- Async[F].pure(wineListState.wines.lift(wineId))
+          _ <- wineOption match {
+            case Some(wine) => for {
+              _ <- editAdviseStateMessage(
+                messageFormatter.getWineMessage(wine, wineId, wineListState.wines.length),
+                ButtonMarkup.AdviseNavigationMarkup
+              )
+              _ <- perChatAdviseStateStore.setCallbackState(state.updateWineListState(wineId = wineId))
+            } yield ()
+            case None => for {
+              _ <- ackCallback(messageFormatter.getWinesOutOfBoundaryErrorMessage)
+            } yield ()
+          }
+        } yield ()
+        editFuture.getOrElse(Async[F].pure()).void
+    }
+  }
+
+
+  onCallbackWithTag(SearchButton.ControlButtonsTag) { implicit cbq =>
+    perChatSearchStateStore.withCallbackState {
+      state =>
+        val editFuture = for {
+          data <- cbq.data
+          nextWine = data match {
+            case NotesButtons.Next.name => (x: Int) => x + 1
+            case NotesButtons.Previous.name => (x: Int) => x - 1
+          }
+          wineId <- nextWine(state.wineId)
+          wineOption <- Async[F].pure(state.wines.lift(wineId))
+          _ <- wineOption match {
+            case Some(wine) => for {
+              _ <- editAdviseStateMessage(
+                messageFormatter.getWineMessage(wine, wineId, state.wines.length),
+                ButtonMarkup.SearchNavigationMarkup
+              )
+              _ <- perChatSearchStateStore.setCallbackState(state.copy(wineId = wineId))
+            } yield ()
+            case None => for {
+              _ <- ackCallback(messageFormatter.getWinesOutOfBoundaryErrorMessage)
+            } yield ()
+          }
+        } yield ()
+        editFuture.getOrElse(Async[F].pure()).void
     }
   }
 
@@ -575,13 +643,13 @@ class WineBot[F[_] : Async](token: String)(
     )
   }
 
-  private def editAdviseStateMessage(text: String)(implicit cbq: CallbackQuery) = {
+  private def editAdviseStateMessage(text: String, markup: InlineKeyboardMarkup = ButtonMarkup.AdviseMarkup)(implicit cbq: CallbackQuery) = {
     request(
       EditMessageText(
         ChatId(cbq.message.get.source),
         cbq.message.get.messageId,
         text = text,
-        replyMarkup = ButtonMarkup.AdviseMarkup,
+        replyMarkup = markup,
         parseMode = ParseMode.Markdown,
       )
     )
@@ -611,7 +679,8 @@ object WineBot {
     messageFormatter: MessageFormatter,
     adviseStateStore: StateStore[F, AdviseState],
     noteStateStore: StateStore[F, NoteState],
+    searchStateStore: StateStore[F, WineListState],
     databaseClient: DatabaseClient[F],
   ): F[WineBot[F]] =
-    Async[F].delay(new WineBot[F](token)(wineClient, messageFormatter, adviseStateStore, noteStateStore, databaseClient))
+    Async[F].delay(new WineBot[F](token)(wineClient, messageFormatter, adviseStateStore, noteStateStore, searchStateStore, databaseClient))
 }
