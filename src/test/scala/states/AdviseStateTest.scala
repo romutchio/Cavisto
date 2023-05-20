@@ -14,7 +14,7 @@ class AdviseStateTest extends AnyFreeSpec with Matchers {
         val emptyState = AdviseState.empty
         val wines = List(Wine("Wine 1"))
 
-        val expected = Some(WineListState.empty)
+        val expected = Some(WineListState(wines))
         val updatedState = emptyState.updateWineListState(wines = Some(wines))
 
         updatedState.wineListState shouldBe expected
