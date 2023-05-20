@@ -19,8 +19,7 @@ class MessageFormatter {
        |- save notes about wine
        |
        |_The commands are:_
-       |$commandList
-       |""".stripMargin
+       |$commandList""".stripMargin
   }
   def getWelcomeMessage(username: Option[String], firstName: String, lastName: Option[String]): String = {
     val name = (username, firstName, lastName) match {
@@ -31,8 +30,7 @@ class MessageFormatter {
     s"""*$name*, welcome to Cavisto bot.
        |
        |_Available commands:_
-       |$commandList
-       |""".stripMargin
+       |$commandList""".stripMargin
   }
 
   def getSearchWinesMessage(input: String): String = {
@@ -90,13 +88,13 @@ class MessageFormatter {
 
   def notesList(notes: List[Note], startWith: Int): String =
     notes.zipWithIndex.map {case (note, id) => noteView(startWith + id, note)}.mkString("\n")
-  def getNotesList(notes: List[Note], pageNumber: Int, onPage: Int = 10): String = {
+  def getNotesList(notes: List[Note], pageNumber: Int, onPage: Int = 10, total: Int): String = {
     val startWith = pageNumber * onPage
     s"""*Personal notes*
        |
-       |${notesList(notes, startWith)}
+       |${if (notes.nonEmpty) notesList(notes, startWith) else "..."}
        |
-       |_Current page: ${pageNumber}_""".stripMargin
+       |_Total:_ $total, _Current page:_ $pageNumber""".stripMargin
   }
 
   val getEditWineNameMessage = "OK. Send me the name of Wine."

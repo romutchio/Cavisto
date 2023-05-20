@@ -466,7 +466,7 @@ class WineBot[F[_] : Async](token: String)(
                 )
                 notesTrimmed = notes.take(Command.Notes.notesMaxCount)
                 _ <- reply(
-                  text = messageFormatter.getNotesList(notesTrimmed, 0),
+                  text = messageFormatter.getNotesList(notesTrimmed, 0, total = notes.length),
                   parseMode = ParseMode.Markdown,
                   replyMarkup = ButtonMarkup.NotesMarkup(notesTrimmed, 0, Command.Notes.notesMaxCount),
                 ).void
@@ -495,7 +495,7 @@ class WineBot[F[_] : Async](token: String)(
                 EditMessageText(
                   ChatId(cbq.message.get.source),
                   cbq.message.get.messageId,
-                  text = messageFormatter.getNotesList(notes, page),
+                  text = messageFormatter.getNotesList(notes, page, total = noteListState.notes.length),
                   parseMode = ParseMode.Markdown,
                   replyMarkup = ButtonMarkup.NotesMarkup(notes, page, Command.Notes.notesMaxCount),
                 )
@@ -566,7 +566,7 @@ class WineBot[F[_] : Async](token: String)(
                 EditMessageText(
                   ChatId(cbq.message.get.source),
                   cbq.message.get.messageId,
-                  text = messageFormatter.getNotesList(notes, page),
+                  text = messageFormatter.getNotesList(notes, page, total = noteListState.notes.length),
                   parseMode = ParseMode.Markdown,
                   replyMarkup = ButtonMarkup.NotesMarkup(notes, page, Command.Notes.notesMaxCount),
                 )
