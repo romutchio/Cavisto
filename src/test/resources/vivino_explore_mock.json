@@ -24,6 +24,9 @@
             "wine_ratings_count": 321,
             "wine_ratings_average": 1.0,
             "wine_status": "Normal"
+          },
+          "image": {
+            "location": "//image1.jpg"
           }
         },
         "price": {
@@ -50,6 +53,9 @@
             "wine_ratings_count": 321,
             "wine_ratings_average": 2.0,
             "wine_status": "Normal"
+          },
+          "image": {
+            "location": "//image2.jpg"
           }
         },
         "price": {
@@ -75,6 +81,9 @@
             "wine_ratings_count": 321,
             "wine_ratings_average": 3.0,
             "wine_status": "Normal"
+          },
+          "image": {
+            "location": "//image3.jpg"
           }
         },
         "price": {

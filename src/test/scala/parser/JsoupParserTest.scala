@@ -20,9 +20,9 @@ class JsoupParserTest extends AnyFreeSpec with Matchers {
     "parseSearchHtml" in {
       val html = getHtml(s"vivino_search.html")
       val expected = List(
-        Wine("Baron d'Arignac Vin Rouge", Some(3.6), Some("570.0 ₽")),
-        Wine("Baron Philippe de Rothschild Les Cépages Pinot Noir", Some(3.4), None),
-        Wine("Baron Philippe de Rothschild Les Cépages Cabernet Sauvignon", Some(3.3), None)
+        Wine("Baron d'Arignac Vin Rouge", Some(3.6), Some("570.0 ₽"), Some("images.vivino.com/thumbs/hS-d4fk0QXqXtcarkza-gQ_pb_300x300.png")),
+        Wine("Baron Philippe de Rothschild Les Cépages Pinot Noir", Some(3.4), None, Some("images.vivino.com/thumbs/rz0KVQ7TSiqhqSqKGae3rw_pb_300x300.png")),
+        Wine("Baron Philippe de Rothschild Les Cépages Cabernet Sauvignon", Some(3.3), None, Some("images.vivino.com/thumbs/out50fmkTjmxOLfuDviwMw_pb_300x300.png"))
       )
       val wines: List[Wine] = parser.parseSearchHtml(html).unsafeRunSync()
       wines shouldBe expected

@@ -17,14 +17,20 @@ class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], http
   private def wineFromMatch(m: Match): Wine = {
     val price = (m.price.currency.prefix, m.price.currency.suffix, m.price.amount) match {
       case (_, _, None) => None
-      case (Some(prefix), None, Some(value)) => Some(s"$prefix $value")
-      case (None, Some(suffix), Some(value)) => Some(s"$value $suffix")
+      case (Some(prefix), None, Some(value)) => Some(f"$prefix $value")
+      case (None, Some(suffix), Some(value)) => Some(f"$value $suffix")
+      case _ => None
+    }
+    val imageUrl = m.vintage.image.location match {
+      case s"//${url}" => Some(url)
+      case x if x.startsWith("http") => Some(x)
       case _ => None
     }
     Wine(
       name = m.vintage.name,
       rating = m.vintage.statistics.wine_ratings_average,
-      price = price
+      price = price,
+      url = imageUrl,
     )
   }
 
@@ -39,9 +45,8 @@ class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], http
   = {
     val query: Map[String, String] =
       List(
-        Some(Map("currency_code" -> currencyCode.code, "order_by" -> "price", "order" -> "asc")),
+        Some(Map("currency_code" -> currencyCode.code, "order_by" -> "ratings_average", "order" -> "desc")),
         countryCode.map(country => Map("country_code" -> country.code, "country_codes[]" -> country.code)),
-        Some(Map("page" -> "1")),
         ratingMin.map(rating => Map("min_rating" -> rating.toString)),
         wineType.map(wine => Map("wine_type_ids[]" -> wine.id.toString)),
         priceMin.map(price => Map("price_range_min" -> price.toString)),
