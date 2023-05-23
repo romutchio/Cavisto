@@ -1,8 +1,8 @@
 package bot.domain.states
 
 import bot.domain.State
-import bot.domain.buttons.{CountryButton, FoodPairingButton, WineTypeButton}
-import vivino.domain.{CountryCode, FoodPairing, Wine, WineType}
+import bot.domain.buttons.{CountryButton, FoodPairingButton, GrapeTypeButton, WineTypeButton}
+import vivino.domain.{CountryCode, FoodPairing, GrapeType, Wine, WineType}
 
 case class WineListState(wines: List[Wine] = Nil, wineId: Int = 0) extends State
 
@@ -12,6 +12,7 @@ case class AdviseState(
   priceMin: Option[Int] = None,
   priceMax: Option[Int] = None,
   foodPairing: Option[String] = None,
+  grapeType: Option[String] = None,
   wineListState: Option[WineListState] = None,
 ) extends State { self =>
 
@@ -30,6 +31,8 @@ case class AdviseState(
   def getWineType: Option[WineType] = self.wineType.flatMap(WineTypeButton.withNameOption(_).map(_.wineType))
 
   def getFoodPairing: Option[FoodPairing] = self.foodPairing.flatMap(FoodPairingButton.withNameOption(_).map(_.foodPairing))
+
+  def getGrapeType: Option[GrapeType] = self.grapeType.flatMap(GrapeTypeButton.withNameOption(_).map(_.grapeType))
 }
 
 object AdviseState {
