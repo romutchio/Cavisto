@@ -1,11 +1,11 @@
 package messageFormatter
 
 import bot.MessageFormatter
-import bot.domain.buttons.{CountryButton, WineTypeButton}
+import bot.domain.buttons.{CountryButton, FoodPairingButton, WineTypeButton}
 import bot.domain.states.AdviseState
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import vivino.domain.Wine
+import vivino.domain.{FoodPairing, Wine}
 
 class MessageFormatterTest extends AnyFreeSpec with Matchers {
   val messageFormatter = new MessageFormatter()
@@ -41,7 +41,8 @@ class MessageFormatterTest extends AnyFreeSpec with Matchers {
           """*Country:* ...
             |*Type:* ...
             |*Price from:* ...
-            |*Price to:* ...""".stripMargin
+            |*Price to:* ...
+            |*Food pairing:* ...""".stripMargin
 
         messageFormatter.adviseStateView(AdviseState.empty) shouldBe expected
       }
@@ -51,9 +52,10 @@ class MessageFormatterTest extends AnyFreeSpec with Matchers {
           """*Country:* Spain
             |*Type:* White
             |*Price from:* € 40
-            |*Price to:* € 90""".stripMargin
+            |*Price to:* € 90
+            |*Food pairing:* Pasta""".stripMargin
 
-        val adviseState = AdviseState(Some(CountryButton.Spain.name), Some(WineTypeButton.White.name), Some(40), Some(90))
+        val adviseState = AdviseState(Some(CountryButton.Spain.name), Some(WineTypeButton.White.name), Some(40), Some(90), Some(FoodPairingButton.Pasta.name))
         messageFormatter.adviseStateView(adviseState) shouldBe expected
       }
     }

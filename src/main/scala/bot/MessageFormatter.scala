@@ -72,7 +72,8 @@ class MessageFormatter {
     s"""*Country:* ${adviseState.country.getOrElse("...")}
        |*Type:* ${adviseState.wineType.getOrElse("...")}
        |*Price from:* ${adviseState.priceMin.map(price => s"€ $price").getOrElse("...")}
-       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}""".stripMargin
+       |*Price to:* ${adviseState.priceMax.map(price => s"€ $price").getOrElse("...")}
+       |*Food pairing:* ${adviseState.foodPairing.getOrElse("...")}""".stripMargin
 
   def noteStateView(noteState: NoteState): String =
     s"""*Wine name*: ${noteState.wineName.getOrElse("...")}

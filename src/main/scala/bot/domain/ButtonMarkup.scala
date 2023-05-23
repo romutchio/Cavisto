@@ -10,6 +10,7 @@ object ButtonMarkup {
       Seq(
         Seq(CountryButton.Selection, WineTypeButton.Selection),
         Seq(PriceButton.Selection(PriceButtonType.Min), PriceButton.Selection(PriceButtonType.Max)),
+        Seq(FoodPairingButton.Selection),
         Seq(AdviseButton.Clear, AdviseButton.Advise),
       ).map(_.map(_.toKeyboardButton))
     )
@@ -32,6 +33,20 @@ object ButtonMarkup {
         Seq(WineTypeButton.Red, WineTypeButton.White, WineTypeButton.Sparkling),
         Seq(WineTypeButton.Rose, WineTypeButton.Dessert, WineTypeButton.Fortified),
         Seq(AdviseButton.Return, WineTypeButton.Clear),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
+
+  val FoodPairingMarkup: InlineKeyboardMarkup = {
+    InlineKeyboardMarkup(
+      Seq(
+        Seq(FoodPairingButton.Aperitif, FoodPairingButton.Appetizers, FoodPairingButton.AnyJunkFood),
+        Seq(FoodPairingButton.FruityDesserts, FoodPairingButton.SweetDesserts),
+        Seq(FoodPairingButton.Beef, FoodPairingButton.Pork, FoodPairingButton.Poultry, FoodPairingButton.CuredMeat),
+        Seq(FoodPairingButton.MildAndSoftCheese, FoodPairingButton.MatureAndHardCheese),
+        Seq(FoodPairingButton.SpicyFood, FoodPairingButton.Mushrooms, FoodPairingButton.Pasta, FoodPairingButton.Vegetarian),
+        Seq(FoodPairingButton.LeanFish, FoodPairingButton.RichFish, FoodPairingButton.Shellfish),
+        Seq(AdviseButton.Return, FoodPairingButton.Clear),
       ).map(_.map(_.toKeyboardButton))
     )
   }

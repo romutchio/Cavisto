@@ -4,7 +4,7 @@ import cats.effect.Async
 import cats.implicits._
 import client.HttpClient
 import io.circe.generic.auto._
-import vivino.domain.{CountryCode, CurrencyCode, ExploreResponse, Match, Wine, WineType}
+import vivino.domain.{CountryCode, CurrencyCode, ExploreResponse, FoodPairing, Match, Wine, WineType}
 import vivino.parser.VivinoHtmlParser
 
 
@@ -41,6 +41,7 @@ class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], http
     ratingMin: Option[Int],
     priceMin: Option[Int],
     priceMax: Option[Int],
+    foodPairing: Option[FoodPairing],
   ): F[List[Wine]]
   = {
     val query: Map[String, String] =
@@ -51,6 +52,7 @@ class VivinoWineClient[F[_] : Async](vivinoHTMLParser: VivinoHtmlParser[F], http
         wineType.map(wine => Map("wine_type_ids[]" -> wine.id.toString)),
         priceMin.map(price => Map("price_range_min" -> price.toString)),
         priceMax.map(price => Map("price_range_max" -> price.toString)),
+        foodPairing.map(food => Map("food_ids[]" -> food.id.toString)),
       ).flatten.reduce(_ |+| _)
 
     httpClient.getJson[ExploreResponse](
