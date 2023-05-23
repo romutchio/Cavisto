@@ -75,6 +75,10 @@ Telegram bot for saving and advising wine
     <img src="docs/command_advise_country.png" width=400>  
   - `Type` button   
     <img src="docs/command_advise_type.png" width=400>  
+  - `Food pairing` button   
+    <img src="docs/command_advise_food_pairing.png" width=400>  
+  - `Grape` button   
+    <img src="docs/command_advise_grape.png" width=400>  
   - `Price` buttons  
     <img src="docs/command_advise_price.png" width=400>  
   - `Advise` button  
