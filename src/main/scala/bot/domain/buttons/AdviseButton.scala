@@ -19,7 +19,7 @@ object AdviseButton {
 
   final case object Advise extends Button {
     val tag: String = "AdviseWine_TAG"
-    val emoji: Option[String] = Some("✅")
+    val emoji: Option[String] = None
     val name: String = "Advise"
   }
 

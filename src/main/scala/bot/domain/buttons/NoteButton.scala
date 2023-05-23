@@ -35,7 +35,7 @@ object EditNoteButton {
 object NoteButton {
   final case object Save extends Button {
     val tag: String = "NoteSave_TAG"
-    val emoji: Option[String] = Some("✅")
+    val emoji: Option[String] = None
     val name: String = "Save note"
   }
 

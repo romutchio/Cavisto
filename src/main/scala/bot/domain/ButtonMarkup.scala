@@ -9,8 +9,8 @@ object ButtonMarkup {
     InlineKeyboardMarkup(
       Seq(
         Seq(CountryButton.Selection, WineTypeButton.Selection),
+        Seq(FoodPairingButton.Selection, GrapeTypeButton.Selection),
         Seq(PriceButton.Selection(PriceButtonType.Min), PriceButton.Selection(PriceButtonType.Max)),
-        Seq(FoodPairingButton.Selection),
         Seq(AdviseButton.Clear, AdviseButton.Advise),
       ).map(_.map(_.toKeyboardButton))
     )
@@ -47,6 +47,17 @@ object ButtonMarkup {
         Seq(FoodPairingButton.SpicyFood, FoodPairingButton.Mushrooms, FoodPairingButton.Pasta, FoodPairingButton.Vegetarian),
         Seq(FoodPairingButton.LeanFish, FoodPairingButton.RichFish, FoodPairingButton.Shellfish),
         Seq(AdviseButton.Return, FoodPairingButton.Clear),
+      ).map(_.map(_.toKeyboardButton))
+    )
+  }
+
+  val GrapeTypeMarkup: InlineKeyboardMarkup = {
+    InlineKeyboardMarkup(
+      Seq(
+        Seq(GrapeTypeButton.CabernetFranc, GrapeTypeButton.CabernetSauvignon, GrapeTypeButton.Chardonnay),
+        Seq(GrapeTypeButton.Grenache, GrapeTypeButton.Malbec, GrapeTypeButton.Merlot, GrapeTypeButton.PinotNoir),
+        Seq(GrapeTypeButton.Riesling, GrapeTypeButton.SauvignonBlanc, GrapeTypeButton.Shiraz),
+        Seq(AdviseButton.Return, GrapeTypeButton.Clear),
       ).map(_.map(_.toKeyboardButton))
     )
   }

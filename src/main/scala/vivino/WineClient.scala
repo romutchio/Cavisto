@@ -1,6 +1,6 @@
 package vivino
 
-import vivino.domain.{CountryCode, CurrencyCode, FoodPairing, Wine, WineType}
+import vivino.domain.{CountryCode, CurrencyCode, FoodPairing, GrapeType, Wine, WineType}
 
 trait WineClient[F[_]] {
   def getWinesByName(name: String): F[List[Wine]]
@@ -13,5 +13,6 @@ trait WineClient[F[_]] {
     priceMin: Option[Int],
     priceMax: Option[Int],
     foodPairing: Option[FoodPairing],
+    grapeType: Option[GrapeType]
   ): F[List[Wine]]
 }

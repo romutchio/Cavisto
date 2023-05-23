@@ -1,7 +1,7 @@
 package messageFormatter
 
 import bot.MessageFormatter
-import bot.domain.buttons.{CountryButton, FoodPairingButton, WineTypeButton}
+import bot.domain.buttons.{CountryButton, FoodPairingButton, GrapeTypeButton, WineTypeButton}
 import bot.domain.states.AdviseState
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
@@ -24,7 +24,7 @@ class MessageFormatterTest extends AnyFreeSpec with Matchers {
       }
 
       "full" in {
-        val wine = Wine("Wine 1", rating = Some(3.2), price = Some("42.12"), url=Some("https://some/url.png"))
+        val wine = Wine("Wine 1", rating = Some(3.2), price = Some("42.12"), url = Some("https://some/url.png"))
         val expected =
           """Found 1 wines:
             |[​](https://some/url.png)
@@ -40,9 +40,10 @@ class MessageFormatterTest extends AnyFreeSpec with Matchers {
         val expected =
           """*Country:* ...
             |*Type:* ...
+            |*Food pairing:* ...
+            |*Grape:* ...
             |*Price from:* ...
-            |*Price to:* ...
-            |*Food pairing:* ...""".stripMargin
+            |*Price to:* ...""".stripMargin
 
         messageFormatter.adviseStateView(AdviseState.empty) shouldBe expected
       }
@@ -51,11 +52,19 @@ class MessageFormatterTest extends AnyFreeSpec with Matchers {
         val expected =
           """*Country:* Spain
             |*Type:* White
+            |*Food pairing:* Pasta
+            |*Grape:* Shiraz
             |*Price from:* € 40
-            |*Price to:* € 90
-            |*Food pairing:* Pasta""".stripMargin
+            |*Price to:* € 90""".stripMargin
 
-        val adviseState = AdviseState(Some(CountryButton.Spain.name), Some(WineTypeButton.White.name), Some(40), Some(90), Some(FoodPairingButton.Pasta.name))
+        val adviseState = AdviseState(
+          Some(CountryButton.Spain.name),
+          Some(WineTypeButton.White.name),
+          Some(40),
+          Some(90),
+          Some(FoodPairingButton.Pasta.name),
+          Some(GrapeTypeButton.Shiraz.name),
+        )
         messageFormatter.adviseStateView(adviseState) shouldBe expected
       }
     }
