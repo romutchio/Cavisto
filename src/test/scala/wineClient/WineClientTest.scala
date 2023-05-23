@@ -76,7 +76,8 @@ class WineClientTest extends AnyFreeSpec with Matchers {
         wineType = Some(WineType.Red),
         ratingMin = None,
         priceMin = None,
-        priceMax = None
+        priceMax = None,
+        foodPairing = None,
       ).unsafeRunSync() shouldBe expected
     }
   }
