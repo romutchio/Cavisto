@@ -172,6 +172,19 @@ class WineBot[F[_] : Async](token: String)(
     }
   }
 
+  onCallbackWithTag(FoodPairingButton.Selection.tag) { implicit cbq =>
+    perChatAdviseStateStore.withCallbackState {
+      state =>
+        for {
+          _ <- handleAdviseSelectionCallback(
+            FoodPairingButton.Selection, ButtonMarkup.FoodPairingMarkup,
+            FoodPairingButton.Clear, _ => state.copy(foodPairing = None),
+            food => _ => state.copy(foodPairing = food),
+          )
+        } yield ()
+    }
+  }
+
   onCallbackWithTag(AdviseButton.Return.tag) { implicit cbq =>
     val editFuture = for {
       msg <- cbq.message
@@ -199,7 +212,8 @@ class WineBot[F[_] : Async](token: String)(
             state.getWineType,
             3,
             state.priceMin,
-            state.priceMax
+            state.priceMax,
+            state.getFoodPairing,
           )
           _ <- perChatAdviseStateStore.setCallbackState(
             state.updateWineListState(wines, 0)
