@@ -266,8 +266,8 @@ class WineBot[F[_] : Async](token: String)(
         val editFuture = for {
           data <- cbq.data
           nextWine = data match {
-            case NotesButtons.Next.name => (x: Int) => x + 1
-            case NotesButtons.Previous.name => (x: Int) => x - 1
+            case SearchButton.Next.name => (x: Int) => x + 1
+            case SearchButton.Previous.name => (x: Int) => x - 1
           }
           wineId <- nextWine(state.wineId)
           wineOption <- Async[F].pure(state.wines.lift(wineId))

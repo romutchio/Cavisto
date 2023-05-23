@@ -3,7 +3,7 @@ package bot.domain.buttons
 import bot.domain.Button
 
 object AdviseButton {
-  val ControlButtonsTag: String = "Notes_TAG"
+  val ControlButtonsTag: String = "AdviseControl_TAG"
 
   final case object Return extends Button {
     val tag: String = "AdviseReturn_TAG"

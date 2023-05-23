@@ -48,7 +48,7 @@ object NoteButton {
   final case object Return extends Button {
     val tag: String = "NoteReturn_TAG"
     val emoji: Option[String] = None
-    val name: String = "Return to notes"
+    val name: String = "Back to notes"
   }
 
 }

@@ -3,7 +3,7 @@ package bot.domain.buttons
 import bot.domain.Button
 
 object SearchButton {
-  val ControlButtonsTag: String = "Search_TAG"
+  val ControlButtonsTag: String = "SearchControl_TAG"
 
   final case object Previous extends Button {
     val emoji: Option[String] = Some("◀\uFE0F")
