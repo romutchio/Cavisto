@@ -3,7 +3,7 @@ package bot.domain.buttons
 import bot.domain.Button
 
 object NotesButtons { self =>
-  val ControlButtonsTag: String = "Notes_TAG"
+  val ControlButtonsTag: String = "NotesControl_TAG"
   val SelectNotesTag: String = "NotesSelect_TAG"
   final case object Previous extends Button {
     val emoji: Option[String] = Some("◀\uFE0F")
