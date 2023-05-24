@@ -340,10 +340,13 @@ class WineBot[F[_] : Async](token: String)(
         for {
           _ <- state.status match {
             case AwaitingWineNameEdit => for {
-              _ <- handleNoteStateEditMessage(
-                s => s.copy(wineName = message.text),
-                messageFormatter.getEditAppliedMessage("Wine name", message.text.get),
-              )
+              _ <- state.validateWineName(message.text) match {
+                case Left(error) => reply(error)
+                case Right(wineName) => handleNoteStateEditMessage(
+                  s => s.copy(wineName = wineName),
+                  messageFormatter.getEditAppliedMessage("Wine name", wineName),
+                )
+              }
             } yield ()
 
             case AwaitingReviewEdit => for {
@@ -355,18 +358,24 @@ class WineBot[F[_] : Async](token: String)(
 
             case AwaitingPriceEdit =>
               for {
-                _ <- handleNoteStateEditMessage(
-                  s => s.copy(price = message.text.flatMap(_.toDoubleOption)),
-                  messageFormatter.getEditAppliedMessage("Price", message.text.get),
-                )
+                _ <- state.validatePrice(message.text.flatMap(_.toDoubleOption)) match {
+                  case Left(error) => reply(error)
+                  case Right(price) => handleNoteStateEditMessage(
+                    s => s.copy(price = price),
+                    messageFormatter.getEditAppliedMessage("Price", price.toString),
+                  )
+                }
               } yield ()
 
             case AwaitingRatingEdit =>
               for {
-                _ <- handleNoteStateEditMessage(
-                  s => s.copy(rating = message.text.flatMap(_.toDoubleOption)),
-                  messageFormatter.getEditAppliedMessage("Rating", message.text.get),
-                )
+                _ <- state.validateRating(message.text.flatMap(_.toDoubleOption)) match {
+                  case Left(error) => reply(error)
+                  case Right(rating) => handleNoteStateEditMessage(
+                    s => s.copy(rating = rating),
+                    messageFormatter.getEditAppliedMessage("Rating", rating.toString),
+                  )
+                }
               } yield ()
 
             case Empty => Async[F].pure()

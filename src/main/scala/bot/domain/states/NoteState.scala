@@ -27,6 +27,37 @@ case class NoteState(
   notesListState: Option[NotesListState] = None,
   editMessageState: Option[EditMessageState] = None,
 ) extends State { self =>
+
+  def validateWineName(wineName: Option[String]): Either[String, String] = for {
+    wine <- wineName match {
+      case Some(value) => if (value.length > 255)
+        Left("Wine name is too long.")
+      else
+        Right(value)
+      case None => Left("Wine name is empty.")
+    }
+  } yield wine
+
+  def validateRating(rating: Option[Double]): Either[String, Double] = for {
+    r <- rating match {
+      case Some(value) => if (value < 1 || value > 5)
+        Left("Rating should be between 1 and 5.")
+      else
+        Right(value)
+      case None => Left("Rating should be number.")
+    }
+  } yield r
+
+  def validatePrice(price: Option[Double]): Either[String, Double] = for {
+    p <- price match {
+      case Some(value) => if (value < 0)
+        Left("Price should not be negative.")
+      else
+        Right(value)
+      case None => Left("Price should be number.")
+    }
+  } yield p
+
   def updateMessageState(messageSource: Option[Long] = None, messageId: Option[Int] = None, noteDbId: Option[Long] = None): NoteState = {
     val editMessageState = self.editMessageState.getOrElse(EditMessageState.empty)
     val updatedState = editMessageState.copy(
