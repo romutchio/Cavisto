@@ -9,12 +9,14 @@ import doobie.util.transactor.Transactor.Aux
 import doobie.{Meta, Transactor}
 import io.circe.generic.auto._
 
-class DoobieDatabaseClient[F[_] : Async] extends DatabaseClient[F] {
+class DoobieDatabaseClient[F[_] : Async](
+  host: String, port: String, user: String, password: String, database: String
+) extends DatabaseClient[F] {
   private val transactor: Aux[F, Unit] = Transactor.fromDriverManager[F](
     "org.postgresql.Driver",
-    "jdbc:postgresql://localhost:5432/cavisto",
-    "cavisto",
-    "cavisto"
+    s"jdbc:postgresql://$host:$port/$database",
+    user,
+    password
   )
 
   implicit val metaAdviseState: Meta[AdviseState] = new Meta(pgDecoderGet, pgEncoderPut)
@@ -63,5 +65,7 @@ class DoobieDatabaseClient[F[_] : Async] extends DatabaseClient[F] {
 }
 
 object DoobieDatabaseClient {
-  def make[F[_] : Async]: F[DoobieDatabaseClient[F]] = Async[F].delay(new DoobieDatabaseClient[F])
+  def make[F[_] : Async](
+    host: String, port: String, user: String, password: String, database: String
+  ): F[DoobieDatabaseClient[F]] = Async[F].delay(new DoobieDatabaseClient[F](host, port, user, password, database))
 }

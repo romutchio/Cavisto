@@ -20,7 +20,12 @@ object Main extends IOApp {
       token <- IO.fromOption(sys.env.get("TELEGRAM_TOKEN"))(
         new Exception("TELEGRAM_TOKEN environment variable not set")
       )
-      databaseClient <- DoobieDatabaseClient.make[IO]
+      dbHost <- IO.fromOption(sys.env.get("DB_HOST"))(new Exception("DB_HOST environment variable not set"))
+      dbPort <- IO.fromOption(sys.env.get("DB_PORT"))(new Exception("DB_PORT environment variable not set"))
+      dbUser <- IO.fromOption(sys.env.get("DB_USER"))(new Exception("DB_USER environment variable not set"))
+      dbPass <- IO.fromOption(sys.env.get("DB_PASS"))(new Exception("DB_PASS environment variable not set"))
+      dbName <- IO.fromOption(sys.env.get("DB_NAME"))(new Exception("DB_NAME environment variable not set"))
+      databaseClient <- DoobieDatabaseClient.make[IO](dbHost, dbPort, dbUser, dbPass, dbName)
       wineBot <- WineBot.make[IO](token, vivinoClient, messageFormatter, adviseStateStore, noteStateStore, searchStateStore, databaseClient)
       _ <- wineBot.startPolling().map(_ => ExitCode.Success)
     } yield ExitCode.Success
