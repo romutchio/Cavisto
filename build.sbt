@@ -66,5 +66,8 @@ addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
 
 lazy val root = (project in file("."))
   .settings(
-    name := "Cavisto"
+    name := "Cavisto",
+    version := "0.1.0-SNAPSHOT",
+    executableScriptName := "main",
   )
+  .enablePlugins(JavaAppPackaging)
